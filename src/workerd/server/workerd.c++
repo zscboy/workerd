@@ -1357,3 +1357,28 @@ int main(int argc, char* argv[]) {
 
   return ::kj::runMainAndExit(context, mainObject.getMain(), argc, argv);
 }
+
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+int workerd_main(int argc, char* argv[]) {
+  ::kj::TopLevelProcessContext context(argv[0]);
+  #if !_WIN32
+  kj::UnixEventPort::captureSignal(SIGTERM);
+  #endif
+  workerd::server::CliMain mainObject(context, argv);
+
+  #ifdef WORKERD_EXPERIMENTAL_ENABLE_WEBGPU
+  workerd::api::gpu::initialize();
+  #endif
+
+  return ::kj::runMainAndExit(context, mainObject.getMain(), argc, argv);
+}
+
+#ifdef __cplusplus
+}
+#endif
+

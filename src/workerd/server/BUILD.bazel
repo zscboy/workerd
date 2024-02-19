@@ -40,6 +40,28 @@ wd_cc_library(
     visibility = ["//visibility:public"],
 )
 
+wd_cc_library(
+    name = "libworkerd",
+    srcs = ["workerd.c++"],
+    hdrs = ["cgo.h"],
+    #malloc = ":malloc",
+    tags = ["no-arm64"],
+    visibility = ["//visibility:public"],
+    includes = ["."],
+    deps = [
+        "//src/workerd/util:autogate",
+        ":server",
+        ":workerd-meta_capnp",
+        ":workerd_capnp",
+        "//src/workerd/util:perfetto",
+        "@capnp-cpp//src/capnp:capnpc",
+	"@workerd-v8//:v8",
+    ] + select({
+        "@platforms//os:windows": [],
+        "//conditions:default": ["@workerd//src/workerd/util:symbolizer"],
+    }),
+)
+
 wd_cc_binary(
     name = "workerd",
     srcs = ["workerd.c++"],
