@@ -1344,6 +1344,7 @@ private:
 
 }  // namespace workerd::server
 
+/*
 int main(int argc, char* argv[]) {
   ::kj::TopLevelProcessContext context(argv[0]);
 #if !_WIN32
@@ -1357,7 +1358,7 @@ int main(int argc, char* argv[]) {
 
   return ::kj::runMainAndExit(context, mainObject.getMain(), argc, argv);
 }
-
+*/
 
 
 #ifdef __cplusplus
