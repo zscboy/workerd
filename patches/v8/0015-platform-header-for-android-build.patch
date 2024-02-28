@@ -1,0 +1,13 @@
+diff --git a/src/base/debug/stack_trace_android.cc b/src/base/debug/stack_trace_android.cc
+index 16fbf9890c9..00334f13f02 100644
+--- a/src/base/debug/stack_trace_android.cc
++++ b/src/base/debug/stack_trace_android.cc
+@@ -12,7 +12,7 @@
+ #include <string.h>
+ #include <unwind.h>
+ 
+-#include <src/base/platform/platform.h>
++#include "src/base/platform/platform.h"
+ 
+ #include <iomanip>
+ #include <ostream>

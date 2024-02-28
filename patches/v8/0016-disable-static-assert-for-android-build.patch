@@ -1,0 +1,13 @@
+diff --git a/src/handles/handles.h b/src/handles/handles.h
+index 051265474ef..a4e95f6f947 100644
+--- a/src/handles/handles.h
++++ b/src/handles/handles.h
+@@ -145,7 +145,7 @@ class Handle final : public HandleBase {
+       // If you got an error here and want to access the Tagged<T>, use
+       // operator* -- e.g. for `Tagged<Smi>::value()`, use `(*handle).value()`.
+       static_assert(
+-          false,
++          true,
+           "This handle does not reference a heap object. Use `(*handle).foo`.");
+ #endif
+     }

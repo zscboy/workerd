@@ -40,6 +40,10 @@ apple_support_dependencies()
 http_archive(
     name = "capnp-cpp",
     sha256 = "bed3c01caad985c91b58c8123cedfe46c4135d1698303d89c89bc49d3deb3697",
+    patch_args = ["-p1"],
+    patches = [
+	"//:patches/capnp-cpp/0001-remove-libpthread-for-android-build.path"
+    ],
     strip_prefix = "capnproto-capnproto-6480280/c++",
     type = "tgz",
     urls = ["https://github.com/capnproto/capnproto/tarball/64802802df1d7780625eeb07b71d249fe49fb68d"],
@@ -245,6 +249,7 @@ cc_library(
     ] + select({
         "@platforms//os:linux": [ "-Wno-implicit-function-declaration" ],
         "@platforms//os:macos": [ "-Wno-implicit-function-declaration" ],
+	"@platforms//os:android": [ "-Wno-implicit-function-declaration" ],
         "//conditions:default": [],
     }),
     visibility = ["//visibility:public"],
@@ -321,6 +326,7 @@ rules_rust_dependencies()
 
 rust_register_toolchains(
     edition = "2021",
+    extra_target_triples = ["aarch64-linux-android", "x86_64-linux-android"],
     versions = ["1.72.1"],
 )
 
@@ -434,6 +440,8 @@ http_archive(
         "//:patches/v8/0012-Fix-V8-ICU-build.patch",
         "//:patches/v8/0013-Randomize-the-initial-ExecutionContextId-used-by-the.patch",
         "//:patches/v8/0014-Always-enable-continuation-preserved-data-in-the-bui.patch",
+	"//:patches/v8/0015-platform-header-for-android-build.patch",
+	"//:patches/v8/0016-disable-static-assert-for-android-build.patch",
     ],
     sha256 = "45e0ba667fb1a86f834d6a92b513c43fcfdc672525c8a5a60bfdb56eec137d4a",
     strip_prefix = "v8-12.1.285.26",
@@ -583,3 +591,66 @@ load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_depe
 go_rules_dependencies()
 
 go_register_toolchains(version = "1.21.6")
+
+http_archive(
+    name = "rules_android",
+    sha256 = "cd06d15dd8bb59926e4d65f9003bfc20f9da4b2519985c27e190cddc8b7a7806",
+    strip_prefix = "rules_android-0.1.1",
+    urls = ["https://github.com/bazelbuild/rules_android/archive/v0.1.1.zip"],
+)
+
+load("@rules_android//android:rules.bzl", "android_sdk_repository")
+
+android_sdk_repository(name = "androidsdk")
+
+http_archive(
+    name = "rules_android_ndk",
+    sha256 = "b1a5ddd784e6ed915c2035c0db536a278b5f50c64412128c06877115991391ef",
+    strip_prefix = "rules_android_ndk-877c68ef34c9f3353028bf490d269230c1990483",
+    url = "https://github.com/bazelbuild/rules_android_ndk/archive/877c68ef34c9f3353028bf490d269230c1990483.zip",
+)
+
+load("@rules_android_ndk//:rules.bzl", "android_ndk_repository")
+
+android_ndk_repository(name = "androidndk")
+
+RULES_JVM_EXTERNAL_TAG = "5.3"
+RULES_JVM_EXTERNAL_SHA ="d31e369b854322ca5098ea12c69d7175ded971435e55c18dd9dd5f29cc5249ac"
+
+http_archive(
+    name = "rules_jvm_external",
+    strip_prefix = "rules_jvm_external-%s" % RULES_JVM_EXTERNAL_TAG,
+    sha256 = RULES_JVM_EXTERNAL_SHA,
+    url = "https://github.com/bazelbuild/rules_jvm_external/releases/download/%s/rules_jvm_external-%s.tar.gz" % (RULES_JVM_EXTERNAL_TAG, RULES_JVM_EXTERNAL_TAG)
+)
+
+load("@rules_jvm_external//:repositories.bzl", "rules_jvm_external_deps")
+
+rules_jvm_external_deps()
+
+load("@rules_jvm_external//:setup.bzl", "rules_jvm_external_setup")
+
+rules_jvm_external_setup()
+
+load("@rules_jvm_external//:defs.bzl", "maven_install")
+
+maven_install(
+    artifacts = [
+	"androidx.appcompat:appcompat:1.5.1",
+        "androidx.constraintlayout:constraintlayout:2.1.4",
+        # Needed to enforce version conflict resolution
+        "androidx.savedstate:savedstate:1.2.0",
+        "androidx.lifecycle:lifecycle-livedata-core:2.5.1",
+        "androidx.lifecycle:lifecycle-livedata:2.5.1",
+        "androidx.lifecycle:lifecycle-process:2.5.1",
+        "androidx.lifecycle:lifecycle-runtime:2.5.1",
+        "androidx.lifecycle:lifecycle-service:2.5.1",
+        "androidx.lifecycle:lifecycle-viewmodel-savedstate:2.5.1",
+        "androidx.lifecycle:lifecycle-viewmodel:2.5.1",
+    ],
+    repositories = [
+        "https://maven.google.com",
+        "https://repo1.maven.org/maven2",
+    ],
+)
+

@@ -88,7 +88,7 @@ index 0c59518819cb685fe9f68080d6bdbeb0b7ff5033..7053ca31b999ae7423e7485ee6392a09
 +    # are resolved before select() can be resolved based on the command line. This could
 +    # alternatively be done by defining build targets and the rules used to declare them twice
 +    # (once for exec and for target).
-+    return "target"
++    return "exec"
 +
  # Use a single generator target for torque definitions and initializers. We can
  # split the set of outputs by using OutputGroupInfo, that way we do not need to
