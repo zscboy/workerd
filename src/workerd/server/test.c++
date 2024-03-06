@@ -255,7 +255,7 @@ int test_workerd() {
     compatibilityDate = "2022-08-17",
     serviceWorkerScript =
         `addEventListener("fetch", event => {
-        `  event.respondWith(new Response("Hello riguang: " + event.request.url + "\n"));
+        `  event.respondWith(new Response("Hello " + event.request.url + "\n"));
         `})
     ))"_kj));
     test.run();
