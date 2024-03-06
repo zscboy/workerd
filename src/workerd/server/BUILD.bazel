@@ -82,6 +82,21 @@ wd_cc_binary(
 )
 
 wd_cc_library(
+    name = "test",
+    srcs = ["test.c++"],
+    hdrs = ["cgo.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":server",
+        "//src/workerd/util:test-util",
+    ] + select({
+        "@platforms//os:windows": [],
+        "//conditions:default": ["@workerd//src/workerd/util:symbolizer"],
+    }),
+)
+
+
+wd_cc_library(
     name = "alarm-scheduler",
     srcs = [
         "alarm-scheduler.c++",

@@ -15,7 +15,7 @@ wd_cc_library(
     }),
     defines = select({
         "@platforms//os:windows": [],
-        "//conditions:default": ["WORKERD_USE_PERFETTO"],
+        "//conditions:default":[], #["WORKERD_USE_PERFETTO"],
     }),
 )
 # TODO(later): Currently perfetto support is not enabled on Windows simply because the
