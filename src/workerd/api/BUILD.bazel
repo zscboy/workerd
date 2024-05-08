@@ -57,6 +57,7 @@ filegroup(
     visibility = ["//visibility:public"],
 )
 
+#        ":html-rewriter",
 wd_cc_library(
     name = "rtti",
     srcs = ["rtti.c++"],
@@ -68,7 +69,6 @@ wd_cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        ":html-rewriter",
         "//src/pyodide",
         "//src/pyodide:pyodide_extra_capnp",
         "//src/workerd/io",
@@ -79,18 +79,18 @@ wd_cc_library(
 
 # Moved out of io library so that it does not depend on lolhtml and the associated rust crates.
 # This reduces the linker input size for tests based on io.
-wd_cc_library(
-    name = "html-rewriter",
-    srcs = ["html-rewriter.c++"],
-    hdrs = ["html-rewriter.h"],
-    implementation_deps = [
-        "@com_cloudflare_lol_html//:lolhtml",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//src/workerd/io",
-    ],
-)
+#wd_cc_library(
+#    name = "html-rewriter",
+#    srcs = ["html-rewriter.c++"],
+#    hdrs = ["html-rewriter.h"],
+#    implementation_deps = [
+#        "@com_cloudflare_lol_html//:lolhtml",
+#    ],
+#    visibility = ["//visibility:public"],
+#    deps = [
+#        "//src/workerd/io",
+#    ],
+#)
 
 wd_cc_library(
     name = "pyodide",
