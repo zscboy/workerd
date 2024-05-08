@@ -15,7 +15,7 @@ common --noenable_bzlmod
 build --remote_download_all
 
 # Enable webgpu
-build --//src/workerd/io:enable_experimental_webgpu=True
+build --//src/workerd/io:enable_experimental_webgpu=False
 
 # Avoid generating duplicate runfile trees. This will become the default in a future bazel version.
 build --legacy_external_runfiles=false
@@ -65,6 +65,9 @@ common --@aspect_rules_ts//ts:default_to_tsc_transpiler
 build:thin-lto -c opt
 build:thin-lto --cxxopt='-flto=thin'
 build:thin-lto --linkopt='-flto=thin'
+# lingh
+build:thin-lto --cxxopt='-fvisibility=hidden'
+build:thin-lto --copt="-fvisibility=hidden"
 
 # configuration used for performance profiling
 build:profile --config=thin-lto
@@ -99,17 +102,17 @@ build --cxxopt="-fbracket-depth=512" --host_cxxopt="-fbracket-depth=512"
 # Need to disable debug-assertions for fastbuild, should be off automatically for opt. As long as
 # rust-level LTO is not enabled, LLVM bitcode is not needed so -C embed-bitcode=n provides a free
 # improvement to build speed and rust-deps code size.
-build --@rules_rust//:extra_rustc_flags=-C,panic=abort,-C,debug-assertions=n,-C,embed-bitcode=n
-build --@rules_rust//:extra_exec_rustc_flags=-C,panic=abort,-C,debug-assertions=n,-C,embed-bitcode=n
+#build --@rules_rust//:extra_rustc_flags=-C,panic=abort,-C,debug-assertions=n,-C,embed-bitcode=n
+#build --@rules_rust//:extra_exec_rustc_flags=-C,panic=abort,-C,debug-assertions=n,-C,embed-bitcode=n
 
-build:fastdbg --@rules_rust//:extra_rustc_flags=-C,panic=unwind,-C,debug-assertions=y,-C,debuginfo=1,-C,embed-bitcode=n
-build:fastdbg --@rules_rust//:extra_exec_rustc_flags=-C,panic=unwind,-C,debug-assertions=y,-C,debuginfo=1,-C,embed-bitcode=n
+#build:fastdbg --@rules_rust//:extra_rustc_flags=-C,panic=unwind,-C,debug-assertions=y,-C,debuginfo=1,-C,embed-bitcode=n
+#build:fastdbg --@rules_rust//:extra_exec_rustc_flags=-C,panic=unwind,-C,debug-assertions=y,-C,debuginfo=1,-C,embed-bitcode=n
 
 # TODO(later): -C codegen-units=1 improves code size and quality, should be enabled in a future
 # release configuration even if lto is off. Similarly, adding -C lto=thin would improve binary size
 # significantly – disable it for now due to compile errors and wrong code generation when bazel and
 # rust use different LLVM versions.
-build:thin-lto --@rules_rust//:extra_rustc_flags=-C,panic=abort,-C,codegen-units=1,-C,embed-bitcode=n
+#build:thin-lto --@rules_rust//:extra_rustc_flags=-C,panic=abort,-C,codegen-units=1,-C,embed-bitcode=n
 
 # common sanitizers options
 build:sanitizer-common --@workerd//src/workerd/server:use_tcmalloc=False
