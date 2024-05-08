@@ -276,81 +276,81 @@ http_archive(
     urls = ["https://github.com/madler/zlib/releases/download/v1.3.1/zlib-1.3.1.tar.xz"],
 )
 
-http_file(
-    name = "cargo_bazel_linux_x64",
-    executable = True,
-    sha256 = "890c1d631ec39ccdccc4f383e9083a44781f529eb6281a84c209874d5449758f",
-    urls = [
-        "https://github.com/bazelbuild/rules_rust/releases/download/0.36.2/cargo-bazel-x86_64-unknown-linux-gnu",
-    ],
-)
-
-http_file(
-    name = "cargo_bazel_linux_arm64",
-    executable = True,
-    sha256 = "7e2e9ee08d6e1b33b1f76f2b521a4c7c295db50cda8679afaebe588113d54859",
-    urls = [
-        "https://github.com/bazelbuild/rules_rust/releases/download/0.36.2/cargo-bazel-aarch64-unknown-linux-gnu",
-    ],
-)
-
-http_file(
-    name = "cargo_bazel_macos_x64",
-    executable = True,
-    sha256 = "a1b2484838291835b65fef49ec373df0579955ef20603836ecd79bf7e903c603",
-    urls = [
-        "https://github.com/bazelbuild/rules_rust/releases/download/0.36.2/cargo-bazel-x86_64-apple-darwin",
-    ],
-)
-
-http_file(
-    name = "cargo_bazel_macos_arm64",
-    executable = True,
-    sha256 = "308984faa357f94b0ac85c6d9f20b6bf4319cdceca9af301b3d73d77a2d16299",
-    urls = [
-        "https://github.com/bazelbuild/rules_rust/releases/download/0.36.2/cargo-bazel-aarch64-apple-darwin",
-    ],
-)
-
-http_file(
-    name = "cargo_bazel_win_x64",
-    downloaded_file_path = "downloaded.exe",  # .exe extension required for Windows to recognise as executable
-    executable = True,
-    sha256 = "8c97381a7f20033104563c808e5530cd76d70c88281b4708ca4c3b834f769246",
-    urls = [
-        "https://github.com/bazelbuild/rules_rust/releases/download/0.36.2/cargo-bazel-x86_64-pc-windows-msvc.exe",
-    ],
-)
-
-http_archive(
-    name = "rules_rust",
-    sha256 = "a761d54e49db06f863468e6bba4a13252b1bd499e8f706da65e279b3bcbc5c52",
-    urls = [
-        "https://github.com/bazelbuild/rules_rust/releases/download/0.36.2/rules_rust-v0.36.2.tar.gz",
-    ],
-)
-
-load("@rules_rust//rust:repositories.bzl", "rules_rust_dependencies", "rust_register_toolchains")
-
-rules_rust_dependencies()
-
-rust_register_toolchains(
-    edition = "2021",
-    versions = ["1.72.1"],
-)
-
-load("@rules_rust//crate_universe:repositories.bzl", "crate_universe_dependencies")
-
-crate_universe_dependencies()
-
-load("//rust-deps/crates:crates.bzl", "crate_repositories")
-
-crate_repositories()
-
-load("@rules_rust//tools/rust_analyzer:deps.bzl", "rust_analyzer_dependencies")
-
-rust_analyzer_dependencies()
-
+#http_file(
+#    name = "cargo_bazel_linux_x64",
+#    executable = True,
+#    sha256 = "890c1d631ec39ccdccc4f383e9083a44781f529eb6281a84c209874d5449758f",
+#    urls = [
+#        "https://github.com/bazelbuild/rules_rust/releases/download/0.36.2/cargo-bazel-x86_64-unknown-linux-gnu",
+#    ],
+#)
+#
+#http_file(
+#    name = "cargo_bazel_linux_arm64",
+#    executable = True,
+#    sha256 = "7e2e9ee08d6e1b33b1f76f2b521a4c7c295db50cda8679afaebe588113d54859",
+#    urls = [
+#        "https://github.com/bazelbuild/rules_rust/releases/download/0.36.2/cargo-bazel-aarch64-unknown-linux-gnu",
+#    ],
+#)
+#
+#http_file(
+#    name = "cargo_bazel_macos_x64",
+#    executable = True,
+#    sha256 = "a1b2484838291835b65fef49ec373df0579955ef20603836ecd79bf7e903c603",
+#    urls = [
+#        "https://github.com/bazelbuild/rules_rust/releases/download/0.36.2/cargo-bazel-x86_64-apple-darwin",
+#    ],
+#)
+#
+#http_file(
+#    name = "cargo_bazel_macos_arm64",
+#    executable = True,
+#    sha256 = "308984faa357f94b0ac85c6d9f20b6bf4319cdceca9af301b3d73d77a2d16299",
+#    urls = [
+#        "https://github.com/bazelbuild/rules_rust/releases/download/0.36.2/cargo-bazel-aarch64-apple-darwin",
+#    ],
+#)
+#
+#http_file(
+#    name = "cargo_bazel_win_x64",
+#    downloaded_file_path = "downloaded.exe",  # .exe extension required for Windows to recognise as executable
+#    executable = True,
+#    sha256 = "8c97381a7f20033104563c808e5530cd76d70c88281b4708ca4c3b834f769246",
+#    urls = [
+#        "https://github.com/bazelbuild/rules_rust/releases/download/0.36.2/cargo-bazel-x86_64-pc-windows-msvc.exe",
+#    ],
+#)
+#
+#http_archive(
+#    name = "rules_rust",
+#    sha256 = "a761d54e49db06f863468e6bba4a13252b1bd499e8f706da65e279b3bcbc5c52",
+#    urls = [
+#        "https://github.com/bazelbuild/rules_rust/releases/download/0.36.2/rules_rust-v0.36.2.tar.gz",
+#    ],
+#)
+#
+#load("@rules_rust//rust:repositories.bzl", "rules_rust_dependencies", "rust_register_toolchains")
+#
+#rules_rust_dependencies()
+#
+#rust_register_toolchains(
+#    edition = "2021",
+#    versions = ["1.72.1"],
+#)
+#
+#load("@rules_rust//crate_universe:repositories.bzl", "crate_universe_dependencies")
+#
+#crate_universe_dependencies()
+#
+#load("//rust-deps/crates:crates.bzl", "crate_repositories")
+#
+#crate_repositories()
+#
+#load("@rules_rust//tools/rust_analyzer:deps.bzl", "rust_analyzer_dependencies")
+#
+#rust_analyzer_dependencies()
+#
 # ========================================================================================
 # Node.js bootstrap
 #
@@ -563,20 +563,21 @@ new_local_repository(
 )
 
 # rust-based lolhtml dependency, including the API header. See rust-deps for details.
-new_local_repository(
-    name = "com_cloudflare_lol_html",
-    build_file_content = """cc_library(
-        name = "lolhtml",
-        hdrs = ["@workerd//rust-deps:lol_html_api"],
-        deps = ["@workerd//rust-deps"],
-        # TODO(soon): This workaround appears to be needed when linking the rust library - figure
-        # out why and develop a better approach to address this.
-        linkopts = select({
-          "@platforms//os:windows": ["ntdll.lib"],
-          "//conditions:default": [""],
-        }),
-        include_prefix = "c-api/include",
-        strip_include_prefix = "c-api/include",
-        visibility = ["//visibility:public"],)""",
-    path = "empty",
-)
+#new_local_repository(
+#    name = "com_cloudflare_lol_html",
+#    build_file_content = """cc_library(
+#        name = "lolhtml",
+#        hdrs = ["@workerd//rust-deps:lol_html_api"],
+#        deps = ["@workerd//rust-deps"],
+#        # TODO(soon): This workaround appears to be needed when linking the rust library - figure
+#        # out why and develop a better approach to address this.
+#        linkopts = select({
+#          "@platforms//os:windows": ["ntdll.lib"],
+#          "//conditions:default": [""],
+#        }),
+#        include_prefix = "c-api/include",
+#        strip_include_prefix = "c-api/include",
+#        visibility = ["//visibility:public"],)""",
+#    path = "empty",
+#)
+#
