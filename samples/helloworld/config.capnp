@@ -18,7 +18,7 @@ const helloWorldExample :Workerd.Config = (
   # Each configuration defines the sockets on which the server will listen.
   # Here, we create a single socket that will listen on localhost port 8080, and will
   # dispatch to the "main" service that we defined above.
-  sockets = [ ( name = "http", address = "*:8080", http = (), service = "main" ) ]
+  sockets = [ ( name = "http", address = "127.0.0.1:8070", http = (), service = "main" ) ]
 );
 
 # The definition of the actual helloWorld worker exposed using the "main" service.
@@ -27,6 +27,11 @@ const helloWorldExample :Workerd.Config = (
 #   https://developers.cloudflare.com/workers/platform/compatibility-dates/
 
 const helloWorld :Workerd.Worker = (
-  serviceWorkerScript = embed "worker.js",
+  #serviceWorkerScript = embed "worker.js",
   compatibilityDate = "2023-02-28",
+  modules = [
+    # Our code is in an ES module (JavaScript).
+    (name = "worker.js", esModule = embed "worker.js"),
+  ],
+
 );
