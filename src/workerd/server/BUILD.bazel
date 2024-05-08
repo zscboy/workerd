@@ -62,7 +62,7 @@ wd_cc_binary(
 )
 
 wd_cc_binary(
-    name = "goworkerd",
+    name = "goworkerdx",
     #copts = ["-g"],
     srcs = ["go.h", "go.c++"],
     malloc = ":malloc",
@@ -84,7 +84,7 @@ wd_cc_binary(
 )
 
 wd_cc_binary(
-    name = "lgoworkerd",
+    name = "goworkerd",
     #copts = ["-g"],
     srcs = ["go.h", "go.c++"],
     malloc = ":malloc",

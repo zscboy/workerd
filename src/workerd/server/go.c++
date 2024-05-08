@@ -69,6 +69,12 @@ int GoWorkerd::init(void) {
     return -1;
   }
 
+  // maybe config has error, 'mError' set by 'reportParsingError'
+  if (mError.size() > 0) {
+    // error occurs
+    return -1;
+  }
+
   auto thread = kj::Thread([&]() {
     serveImpl();
   });
@@ -83,6 +89,7 @@ int GoWorkerd::init(void) {
     tryi++;
   }
 
+  // maybe 'Server' has error, set by 'Server' constructor callback
   if (mError.size() > 0) {
     // error occurs
     return -1;

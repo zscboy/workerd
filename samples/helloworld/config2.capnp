@@ -1,3 +1,4 @@
+@0xfeb2cedfa6aad686;
 # Imports the base schema for workerd configuration files.
 
 # Refer to the comments in /src/workerd/server/workerd.capnp for more details.
