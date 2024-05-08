@@ -27,7 +27,7 @@ class CryptoKey;
 class SubtleCrypto;
 class TextDecoder;
 class TextEncoder;
-class HTMLRewriter;
+//class HTMLRewriter;
 class Response;
 class TraceItem;
 class ScheduledController;
@@ -568,7 +568,7 @@ public:
     // Off-spec extensions.
     JSG_NESTED_TYPE(FixedLengthStream);
     JSG_NESTED_TYPE(IdentityTransformStream);
-    JSG_NESTED_TYPE(HTMLRewriter);
+    //JSG_NESTED_TYPE(HTMLRewriter);
 
 #ifdef WORKERD_EXPERIMENTAL_ENABLE_WEBGPU
     // WebGPU

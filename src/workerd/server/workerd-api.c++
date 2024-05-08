@@ -15,7 +15,7 @@
 #include <workerd/api/crypto-impl.h>
 #include <workerd/api/encoding.h>
 #include <workerd/api/global-scope.h>
-#include <workerd/api/html-rewriter.h>
+//#include <workerd/api/html-rewriter.h>
 #include <workerd/api/hyperdrive.h>
 #include <workerd/api/kv.h>
 #include <workerd/api/modules.h>
@@ -71,7 +71,7 @@ JSG_DECLARE_ISOLATE_TYPE(JsgWorkerdIsolate,
   EW_CRYPTO_ISOLATE_TYPES,
   EW_ENCODING_ISOLATE_TYPES,
   EW_FORMDATA_ISOLATE_TYPES,
-  EW_HTML_REWRITER_ISOLATE_TYPES,
+  //EW_HTML_REWRITER_ISOLATE_TYPES,
   EW_HTTP_ISOLATE_TYPES,
   EW_SOCKETS_ISOLATE_TYPES,
   EW_KV_ISOLATE_TYPES,
