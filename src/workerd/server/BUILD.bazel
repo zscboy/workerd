@@ -90,6 +90,7 @@ wd_cc_binary(
     malloc = ":malloc",
     tags = ["no-arm64"],
     linkshared=1,
+    linkopts=['-Wl,-soname=libgoworkerd.so'],
     visibility = ["//visibility:public"],
     deps = [
         ":server",
