@@ -62,6 +62,7 @@ wd_cc_library(
         "@capnp-cpp//src/kj/compat:kj-gzip",
     ],
     visibility = ["//visibility:public"],
+    #copts = ["-g"],
     deps = [
         ":actor-id",
         ":actor-storage_capnp",

@@ -52,6 +52,7 @@ wd_cc_library(
         "//src/workerd/util:autogate.h",
     ],
     visibility = ["//visibility:public"],
+    #copts = ["-g"],
     deps = [
         ":exception",
         ":memory-tracker",
