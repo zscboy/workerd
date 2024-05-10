@@ -14,6 +14,8 @@
 #include <kj/compat/http.h>
 #include <openssl/rand.h>
 
+#include "gofs.h"
+
 #define DLL_EXPORT __attribute__((visibility("default")))
 
 extern "C" {
@@ -302,8 +304,7 @@ class GoWorkerd: public SchemaFileImpl::ErrorReporter{
 public:
   GoWorkerd(const kj::String & id, const kj::String & dir, const kj::String & configFile, workerd::jsg::V8System& v8System):
     mId(kj::str(id)), mDir(kj::str(dir)), mConfigFile(kj::str(configFile)), mV8System(v8System), mServeThreadRunning(false) {
-      mFS = kj::newDiskFilesystem();
-
+      mFS = newGoDiskFilesystem(dir);
   }
 
   virtual ~GoWorkerd() {
