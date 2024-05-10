@@ -20,8 +20,9 @@ build --//src/workerd/io:enable_experimental_webgpu=False
 # Avoid generating duplicate runfile trees. This will become the default in a future bazel version.
 build --legacy_external_runfiles=false
 
+# lingh: comment out for android build
 # Flip this early to avoid breaking compatibility once it becomes the default.
-build --incompatible_disallow_empty_glob
+#build --incompatible_disallow_empty_glob
 
 # Dawn tint build flags
 build --@dawn//src/tint:tint_build_glsl_writer=False
@@ -68,6 +69,7 @@ build:thin-lto --linkopt='-flto=thin'
 # lingh
 build:thin-lto --cxxopt='-fvisibility=hidden'
 build:thin-lto --copt="-fvisibility=hidden"
+build:thin-lto --cxxopt='-Wno-invalid-offsetof'
 
 # configuration used for performance profiling
 build:profile --config=thin-lto
@@ -177,7 +179,7 @@ build:linux --action_env=BAZEL_LINKLIBS='-l%:libc++.a -lm -static-libgcc'
 # On Linux, enable PIC. In macos pic is the default, and the objc_library rule does not work
 # correctly if we use this flag since it will not find the object files to include
 # https://github.com/bazelbuild/bazel/issues/12439#issuecomment-914449079
-build:linux --force_pic
+#build:linux --force_pic
 
 # On Linux, garbage collection sections and optimize binary size. These do not apply to the macOS
 # toolchain.
