@@ -39,6 +39,10 @@ apple_support_dependencies()
 
 http_archive(
     name = "capnp-cpp",
+    patch_args = ["-p1"],
+    patches = [
+        "//:patches/capnp-cpp/0001-remove-libpthread-for-android-build.patch",
+    ],
     sha256 = "21ae72a199a995b72e9bd359d4815539158d93a15cf36e284ef201fde7338c3c",
     strip_prefix = "capnproto-capnproto-8ba7a6e/c++",
     type = "tgz",
@@ -257,6 +261,7 @@ cc_library(
     copts = [
         "-w",
         "-Dverbose=-1",
+        "-std=c90",
     ] + select({
         "@platforms//os:linux": [ "-Wno-implicit-function-declaration" ],
         "@platforms//os:macos": [ "-Wno-implicit-function-declaration" ],
@@ -451,6 +456,8 @@ http_archive(
         "//:patches/v8/0014-increase-visibility-of-virtual-method.patch",
         "//:patches/v8/0015-Add-ValueSerializer-SetTreatFunctionsAsHostObjects.patch",
         "//:patches/v8/0016-wasm-liftoff-arm64-Fix-LoadTaggedPointer.patch",
+        "//:patches/v8/0017-platform-header-for-android-build.patch",
+        "//:patches/v8/0018-disable-static-assert-for-android-build.patch",
     ],
     integrity = "sha256-QphdaJn35eZeo+qoayNFIgm02hX5WHjKf+pr3WXCiEs=",
     strip_prefix = "v8-12.3.219.10",
@@ -581,3 +588,25 @@ new_local_repository(
 #    path = "empty",
 #)
 #
+
+#Or a later commit
+RULES_ANDROID_NDK_COMMIT= "1ed5be3498d20c8120417fe73b6a5f2b4a3438cc"
+#RULES_ANDROID_NDK_SHA = "b29409496439cdcdb50a8e161c4953ca78a548e16d3ee729a1b5cd719ffdacbf"
+
+#load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+http_archive(
+    name = "rules_android_ndk",
+    url = "https://github.com/bazelbuild/rules_android_ndk/archive/%s.zip" % RULES_ANDROID_NDK_COMMIT,
+    #sha256 = RULES_ANDROID_NDK_SHA,
+    strip_prefix = "rules_android_ndk-%s" % RULES_ANDROID_NDK_COMMIT,
+)
+
+load("@rules_android_ndk//:rules.bzl", "android_ndk_repository")
+
+android_ndk_repository(
+    name = "androidndk", # Required. Name *must* be "androidndk".
+    path = "/home/abc/android-ndk-r26c", # Optional. Can be omitted if `ANDROID_NDK_HOME` environment variable is set.
+    #api_level = 23,
+)
+
+register_toolchains("@androidndk//:all")
