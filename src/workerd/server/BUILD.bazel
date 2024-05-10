@@ -64,7 +64,10 @@ wd_cc_binary(
 wd_cc_binary(
     name = "goworkerdx",
     #copts = ["-g"],
-    srcs = ["go.h", "go.c++"],
+    srcs = ["go.h", "go.c++", "gofs.h"] + select({
+        "@platforms//os:windows": ["gofs-windows.c++"],
+        "//conditions:default": ["gofs-unix.c++"],
+    }),
     malloc = ":malloc",
     tags = ["no-arm64"],
     #linkshared=1,
@@ -86,11 +89,17 @@ wd_cc_binary(
 wd_cc_binary(
     name = "goworkerd",
     #copts = ["-g"],
-    srcs = ["go.h", "go.c++"],
+    srcs = ["go.h", "go.c++", "gofs.h"] + select({
+        "@platforms//os:windows": ["gofs-windows.c++"],
+        "//conditions:default": ["gofs-unix.c++"],
+    }),
     malloc = ":malloc",
     tags = ["no-arm64"],
     linkshared=1,
-    linkopts=['-Wl,-soname=libgoworkerd.so'],
+    linkopts=['-Wl,-soname=libgoworkerd.so'] + select({
+        "@platforms//os:android": ['-llog'],
+        "//conditions:default": [],
+    }),
     visibility = ["//visibility:public"],
     deps = [
         ":server",
