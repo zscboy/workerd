@@ -592,13 +592,13 @@ new_local_repository(
 
 #Or a later commit
 RULES_ANDROID_NDK_COMMIT= "1ed5be3498d20c8120417fe73b6a5f2b4a3438cc"
-#RULES_ANDROID_NDK_SHA = "b29409496439cdcdb50a8e161c4953ca78a548e16d3ee729a1b5cd719ffdacbf"
+RULES_ANDROID_NDK_SHA = "sha256-8ji0sDI/HgAopKPxCTV01w8IeGf0spYmRpoR6q+f1j8="
 
 #load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 http_archive(
     name = "rules_android_ndk",
     url = "https://github.com/bazelbuild/rules_android_ndk/archive/%s.zip" % RULES_ANDROID_NDK_COMMIT,
-    #sha256 = RULES_ANDROID_NDK_SHA,
+    integrity = RULES_ANDROID_NDK_SHA,
     strip_prefix = "rules_android_ndk-%s" % RULES_ANDROID_NDK_COMMIT,
 )
 
