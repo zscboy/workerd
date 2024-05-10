@@ -596,11 +596,20 @@ kj::Maybe<kj::StringPtr> getJsStackTrace(void* ucontext, kj::ArrayPtr<char> scra
   state.pc = reinterpret_cast<void*>(mcontext.gregs[REG_RIP]);
   state.sp = reinterpret_cast<void*>(mcontext.gregs[REG_RSP]);
   state.fp = reinterpret_cast<void*>(mcontext.gregs[REG_RBP]);
-#elif defined(__linux__) && defined(__aarch64__)
+#elif defined(__linux__) && defined(__aarch64__) // android-arm64-v8a
   state.pc = reinterpret_cast<void*>(mcontext.pc);
   state.sp = reinterpret_cast<void*>(mcontext.sp);
   state.fp = reinterpret_cast<void*>(mcontext.regs[29]);
   state.lr = reinterpret_cast<void*>(mcontext.regs[30]);
+#elif defined(__linux__) && defined(__arm__) // lingh: android-armeabi-v7a
+  state.pc = reinterpret_cast<void*>(mcontext.arm_pc);
+  state.sp = reinterpret_cast<void*>(mcontext.arm_sp);
+  state.fp = reinterpret_cast<void*>(mcontext.arm_fp);
+  state.lr = reinterpret_cast<void*>(mcontext.arm_lr);
+#elif defined(__linux__) && defined(__i386__) // lingh: android-x86-32
+  state.pc = reinterpret_cast<void*>(mcontext.gregs[REG_RIP]);
+  state.sp = reinterpret_cast<void*>(mcontext.gregs[REG_RSP]);
+  state.fp = reinterpret_cast<void*>(mcontext.gregs[REG_RBP]);
 #else
   #error "Please add architecture support. See FillRegisterState() in v8/src/libsampler/sampler.cc"
 #endif

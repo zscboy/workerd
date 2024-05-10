@@ -458,6 +458,7 @@ http_archive(
         "//:patches/v8/0016-wasm-liftoff-arm64-Fix-LoadTaggedPointer.patch",
         "//:patches/v8/0017-platform-header-for-android-build.patch",
         "//:patches/v8/0018-disable-static-assert-for-android-build.patch",
+        "//:patches/v8/0019-armv7-android-build.patch",
     ],
     integrity = "sha256-QphdaJn35eZeo+qoayNFIgm02hX5WHjKf+pr3WXCiEs=",
     strip_prefix = "v8-12.3.219.10",
