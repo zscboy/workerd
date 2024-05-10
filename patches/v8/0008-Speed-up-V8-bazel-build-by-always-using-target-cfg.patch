@@ -22,11 +22,11 @@ index fcfc5aa3ad57722c4b4d11783cf5ae704c8c859f..6a1a43db67d607b23f7319f296f03dc6
 +    "genrule_target",
  )
  load(":bazel/v8-non-pointer-compression.bzl", "v8_binary_non_pointer_compression")
- 
+
 @@ -4048,22 +4049,20 @@ filegroup(
      }),
  )
- 
+
 -genrule(
 +genrule_target(
      name = "generated_bytecode_builtins_list",
@@ -38,7 +38,7 @@ index fcfc5aa3ad57722c4b4d11783cf5ae704c8c859f..6a1a43db67d607b23f7319f296f03dc6
 +    args = ["$(location :builtins-generated/bytecodes-builtins-list.h)"],
 +    tool = ":bytecode_builtins_list_generator",
  )
- 
+
 -genrule(
 +genrule_target(
      name = "generated_regexp_special_case",
@@ -50,7 +50,7 @@ index fcfc5aa3ad57722c4b4d11783cf5ae704c8c859f..6a1a43db67d607b23f7319f296f03dc6
 +    args = ["$(location :src/regexp/special-case.cc)"],
 +    tool = ":regexp_special_case_generator",
  )
- 
+
  v8_mksnapshot(
 @@ -4263,8 +4262,6 @@ v8_binary(
      srcs = [
@@ -76,7 +76,7 @@ index f050b04f76b96fbc761671958126b62288f94fd5..e3f5a9b50341b2d083e0b4532b99f930
 @@ -337,6 +337,15 @@ def v8_library(
              **kwargs
          )
- 
+
 +def get_cfg():
 +    # Setting the configuration to "target" allows us to avoid compiling code used in both V8 and a
 +    # generator tool twice. For cross-compilation this would need to be set to "exec" manually.
@@ -84,7 +84,7 @@ index f050b04f76b96fbc761671958126b62288f94fd5..e3f5a9b50341b2d083e0b4532b99f930
 +    # are resolved before select() can be resolved based on the command line. This could
 +    # alternatively be done by defining build targets and the rules used to declare them twice
 +    # (once for exec and for target).
-+    return "target"
++    return "exec"
 +
  # Use a single generator target for torque definitions and initializers. We can
  # split the set of outputs by using OutputGroupInfo, that way we do not need to
@@ -121,7 +121,7 @@ index f050b04f76b96fbc761671958126b62288f94fd5..e3f5a9b50341b2d083e0b4532b99f930
 +    # difficult.
 +    # cfg = v8_target_cpu_transition,
  )
- 
+
  def v8_mksnapshot(name, args, suffix = ""):
 @@ -637,3 +649,34 @@ def v8_build_config(name):
          outs = ["icu/" + name + ".json"],

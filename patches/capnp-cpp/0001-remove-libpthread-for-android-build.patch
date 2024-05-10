@@ -1,0 +1,17 @@
+diff --git a/src/kj/BUILD.bazel b/src/kj/BUILD.bazel
+index de89d41e..34aa2308 100644
+--- a/src/kj/BUILD.bazel
++++ b/src/kj/BUILD.bazel
+@@ -74,10 +74,10 @@ cc_library(
+     linkopts = select({
+         "@platforms//os:windows": [],
+         ":use_libdl": [
+-            "-lpthread",
++            #"-lpthread",
+             "-ldl",
+         ],
+-        "//conditions:default": ["-lpthread"],
++        "//conditions:default": [],
+     }),
+     visibility = ["//visibility:public"],
+     deps = [":kj-defines"],
