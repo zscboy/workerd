@@ -42,6 +42,7 @@ http_archive(
     patch_args = ["-p1"],
     patches = [
         "//:patches/capnp-cpp/0001-remove-libpthread-for-android-build.patch",
+        "//:patches/capnp-cpp/0002-memfd-create-for-android-build.patch",
     ],
     sha256 = "21ae72a199a995b72e9bd359d4815539158d93a15cf36e284ef201fde7338c3c",
     strip_prefix = "capnproto-capnproto-8ba7a6e/c++",
@@ -607,7 +608,7 @@ load("@rules_android_ndk//:rules.bzl", "android_ndk_repository")
 android_ndk_repository(
     name = "androidndk", # Required. Name *must* be "androidndk".
     path = "/home/abc/android-ndk-r26c", # Optional. Can be omitted if `ANDROID_NDK_HOME` environment variable is set.
-    #api_level = 23,
+    api_level = 23,
 )
 
 register_toolchains("@androidndk//:all")
