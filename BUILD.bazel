@@ -45,6 +45,10 @@ platform(
     ],
 )
 
+# use following cmd to build android_armeabi-v7a
+#   bazelisk build //src/workerd/server:goworkerd --config=thin-lto --config=m32 --platforms=//:android_armeabi-v7a
+# need gcc-multilib in host platform
+#   sudo apt-get install -y gcc-multilib
 platform(
     name = "android_armeabi-v7a",
     constraint_values = [
@@ -58,6 +62,16 @@ platform(
     constraint_values = [
         "@platforms//os:android",
         "@platforms//cpu:x86_64",
+    ],
+)
+
+# for build android_armeabi-v7a, used in '.bazelrc'
+#  build:m32 --extra_execution_platforms=//:linux_x86
+platform(
+    name = "linux_x86",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_32",
     ],
 )
 

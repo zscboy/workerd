@@ -460,6 +460,9 @@ http_archive(
         "//:patches/v8/0017-platform-header-for-android-build.patch",
         "//:patches/v8/0018-disable-static-assert-for-android-build.patch",
         "//:patches/v8/0019-armv7-android-build.patch",
+        "//:patches/v8/0020-armv7-android-build-maglev.patch",
+        "//:patches/v8/0021-armv7-android-build-missing-typename.patch",
+        "//:patches/v8/0022-armv7-android-build-missing-google3.patch",
     ],
     integrity = "sha256-QphdaJn35eZeo+qoayNFIgm02hX5WHjKf+pr3WXCiEs=",
     strip_prefix = "v8-12.3.219.10",
@@ -612,3 +615,7 @@ android_ndk_repository(
 )
 
 register_toolchains("@androidndk//:all")
+
+register_toolchains(
+    "//toolchain:cc_toolchain_for_linux_x86_32"
+)
