@@ -83,7 +83,12 @@ wd_cc_binary(
     ] + select({
         "@platforms//os:windows": [],
         "//conditions:default": ["@workerd//src/workerd/util:symbolizer"],
-    }),
+    }) + select ({
+        "@//:m32h": [],
+        "@//:m64h": [],
+        },
+        no_match_error = "Please use --config=m32 for 32bits target or --config=m64 for 64bits targets",
+    ),
 )
 
 wd_cc_binary(
@@ -112,7 +117,12 @@ wd_cc_binary(
     ] + select({
         "@platforms//os:windows": [],
         "//conditions:default": ["@workerd//src/workerd/util:symbolizer"],
-    }),
+    }) + select ({
+        "@//:m32h": [],
+        "@//:m64h": [],
+        },
+        no_match_error = "Please use --config=m32 for 32bits target or --config=m64 for 64bits targets",
+    ),
 )
 
 wd_cc_library(

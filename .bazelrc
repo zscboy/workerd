@@ -78,6 +78,7 @@ build:m32 --host_linkopt="-m32"
 build:m32 --host_linkopt="-latomic"
 build:m32 --extra_execution_platforms=//:linux_x86
 # build:m32 --extra_toolchains=//:cc_toolchain_for_linux_x86_32
+build:m32 --//:is_target_m64=False --//:is_target_m32=True
 
 # configuration used for performance profiling
 build:profile --config=thin-lto
@@ -185,6 +186,10 @@ build:macos --copt='-femit-dwarf-unwind=no-compact-unwind'
 # lingh: host copt need not use 'llvm libc++'
 build:linux --cxxopt='-stdlib=libc++'
 build:linux --linkopt='-stdlib=libc++'
+# lingh: for x64 host
+build:m64 --host_cxxopt='-stdlib=libc++'
+build:m64 --host_linkopt='-stdlib=libc++'
+build:m64 --//:is_target_m64=True --//:is_target_m32=False
 build:linux --action_env=BAZEL_LINKLIBS='-l%:libc++.a -lm -static-libgcc'
 
 # On Linux, enable PIC. In macos pic is the default, and the objc_library rule does not work

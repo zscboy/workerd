@@ -112,3 +112,75 @@ selects.config_setting_group(
     name = "use_dead_strip",
     match_all = ["@platforms//os:macos", ":set_dead_strip", ":not_dbg_build"],
 )
+
+config_setting(
+    name = "android-arm",
+    constraint_values = [
+        "@platforms//os:android",
+        "@platforms//cpu:armv7",
+    ],
+)
+
+config_setting(
+    name = "android-arm64",
+    constraint_values = [
+        "@platforms//os:android",
+        "@platforms//cpu:arm64",
+    ],
+)
+
+config_setting(
+    name = "android-x64",
+    constraint_values = [
+        "@platforms//os:android",
+        "@platforms//cpu:x86_64",
+    ],
+)
+
+config_setting(
+    name = "linux-x64",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+)
+
+selects.config_setting_group(
+    name = "target32",
+    match_any = [":android-arm"],
+)
+
+selects.config_setting_group(
+    name = "target64",
+    match_any = [":android-arm64", ":android-x64", ":linux-x64"],
+)
+
+bool_flag(
+    name = "is_target_m32",
+    build_setting_default = False,
+)
+
+bool_flag(
+    name = "is_target_m64",
+    build_setting_default = False,
+)
+
+config_setting(
+    name = "m64flag",
+    flag_values = {"is_target_m64": "True"},
+)
+
+config_setting(
+    name = "m32flag",
+    flag_values = {"is_target_m32": "True"},
+)
+
+selects.config_setting_group(
+    name = "m64h",
+    match_all = [":target64", ":m64flag"],
+)
+
+selects.config_setting_group(
+    name = "m32h",
+    match_all = [":target32", ":m32flag"],
+)
