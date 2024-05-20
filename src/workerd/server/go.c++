@@ -85,7 +85,11 @@ int GoWorkerd::init(void) {
   // when serve-thread has exception, 'mServeThreadRunning' maybe always false
   auto tryi = 0;
   while (!mServeThreadRunning && tryi < 10) {
-    usleep(100);
+    #if _WIN32
+        Sleep(100);
+    #else
+        usleep(100);
+    #endif
     tryi++;
   }
 
@@ -226,7 +230,11 @@ void GoWorkerd::stopServeThread() {
       });
 
       while (mServeThreadRunning) {
-        usleep(100);
+        #if _WIN32
+          Sleep(100);
+        #else
+          usleep(100);
+        #endif
       }
     }
   }

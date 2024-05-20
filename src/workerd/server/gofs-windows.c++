@@ -2,11 +2,8 @@
 #include <kj/memory.h>
 #include <kj/debug.h>
 
-#include "win32-api-version.h"
-
 #include <windows.h>
 #include <winioctl.h>
-#include "windows-sanity.h"
 
 #include "gofs.h"
 
@@ -81,8 +78,9 @@ public:
 
   Maybe<Own<const ReadableFile>> tryOpenFile(PathPtr path) const override {
     HANDLE newHandle;
+    auto pathArray = path.forWin32Api(true);
     KJ_WIN32_HANDLE_ERRORS(newHandle = CreateFileW(
-        nativePath(path).begin(),
+        pathArray.begin(),
         GENERIC_READ,
         FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
         NULL,
