@@ -27,3 +27,13 @@ struct CreateWorkerdInput {
 struct DestroyWorkerdInput {
   id       @0:Text;
 }
+
+struct QueryWorkerdInput {
+  id       @0:Text;
+}
+
+struct QueryWorkerdOutput {
+  code   @0:Int32;
+  error  @1:Text;
+  state  @2:Int32;
+}

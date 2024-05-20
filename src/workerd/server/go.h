@@ -390,6 +390,8 @@ private:
     kj::String onInitRuntime(const kj::String& args);
     kj::String onCeateWorkerd(const kj::String& args);
     kj::String onDestroyWorkerd(const kj::String& args);
+    kj::String onQueryWorkerd(const kj::String& args);
+
     void reportEvent(const kj::String& event);
 
 private:
