@@ -52,6 +52,7 @@ kj::Maybe<kj::Own<capnp::SchemaFile>> tryImportBulitin(kj::StringPtr name) {
 
 int GoWorkerd::init(void) {
   int socketCnt = 0;
+  kj::StringPtr socketName;
   kj::Maybe<kj::Exception> maybeException = kj::runCatchingExceptions([&]() {
     auto path = kj::Path(nullptr);
     path = path.evalNative(mDir);
@@ -63,6 +64,7 @@ int GoWorkerd::init(void) {
     auto config = getConfig();
     for (auto sock: config.getSockets()) {
       socketCnt++;
+      socketName = sock.getName();
     }
   });
 
@@ -80,6 +82,11 @@ int GoWorkerd::init(void) {
 
   if (socketCnt > 1) {
     mError = kj::str("GoWorkerd::init config file has more than 1 sockets: ", socketCnt);
+    return -1;
+  }
+
+  if (socketName == nullptr || socketName.size() == 0) {
+    mError = kj::str("GoWorkerd::init config file socket has no name");
     return -1;
   }
 
@@ -201,7 +208,6 @@ void GoWorkerd::serveImpl() {
       server->overrideSocket(kj::str(name), kj::str(mAddr));
     }
 
-    server->limitSockets(1);
     auto func = [&](jsg::V8System& v8System, config::Config::Reader config) {
 
   #if _WIN32
