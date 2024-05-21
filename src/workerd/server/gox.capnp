@@ -22,6 +22,7 @@ struct CreateWorkerdInput {
   id       @0:Text;
   directory  @1:Text;
   configFile @2:Text;
+  socketAddr @3:Text;
 }
 
 struct DestroyWorkerdInput {

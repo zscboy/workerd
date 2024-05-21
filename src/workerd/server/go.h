@@ -8,6 +8,7 @@
 #include <capnp/dynamic.h>
 #include <workerd/server/workerd.capnp.h>
 #include <workerd/server/workerd-meta.capnp.h>
+#include <workerd/server/gox.capnp.h>
 #include <kj/filesystem.h>
 #include <kj/async-io.h>
 #include <kj/async-queue.h>
@@ -302,9 +303,11 @@ private:
 
 class GoWorkerd: public SchemaFileImpl::ErrorReporter{
 public:
-  GoWorkerd(const kj::String & id, const kj::String & dir, const kj::String & configFile, workerd::jsg::V8System& v8System):
-    mId(kj::str(id)), mDir(kj::str(dir)), mConfigFile(kj::str(configFile)), mV8System(v8System), mServeThreadRunning(false) {
-      mFS = newGoDiskFilesystem(dir);
+  GoWorkerd(gox::CreateWorkerdInput::Builder& input, workerd::jsg::V8System& v8System):
+    mId(kj::str(input.getId())), mDir(kj::str(input.getDirectory())),
+    mConfigFile(kj::str(input.getConfigFile())),mAddr(kj::str(input.getSocketAddr())), mV8System(v8System),
+    mServeThreadRunning(false) {
+      mFS = newGoDiskFilesystem(input.getDirectory());
   }
 
   virtual ~GoWorkerd() {
@@ -335,6 +338,7 @@ private:
   kj::String mId;
   kj::String mDir;
   kj::String mConfigFile;
+  kj::String mAddr;
   workerd::jsg::V8System& mV8System;
 
   mutable bool mServeThreadRunning;
