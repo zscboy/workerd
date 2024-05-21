@@ -267,16 +267,17 @@ void GoWorkerd::stopServeThread() {
 }
 
 kj::String WorkerdGoRuntime::onJsonCall(const char* jsonString) {
-#if _WIN32
-  auto maybelock = mLock.lockExclusive();
-#else
+#if __linux__
   kj::Duration timeout = 5 * kj::SECONDS;
   auto maybelock = mLock.lockExclusiveWithTimeout(timeout);
 
   if (maybelock == kj::none) {
     return kj::str("{\"code\":-1,\"msg\":\"lock timeout\"}");
   }
+#else
+  auto maybelock = mLock.lockExclusive();
 #endif
+
   capnp::MallocMessageBuilder inputMessage;
   capnp::JsonCodec json;
   json.handleByAnnotation<gox::JSONCallInput>();
