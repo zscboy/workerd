@@ -85,7 +85,7 @@ int GoWorkerd::init(void) {
     return -1;
   }
 
-  if (socketName == nullptr || socketName.size() == 0) {
+  if (socketCnt > 0 && (socketName == nullptr || socketName.size() == 0)) {
     mError = kj::str("GoWorkerd::init config file socket has no name");
     return -1;
   }
