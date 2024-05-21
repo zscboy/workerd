@@ -80,9 +80,14 @@ build:m32 --extra_toolchains=//toolchain:cc_toolchain_for_linux_x86_32
 build:m32 --//:is_target_m64=False --//:is_target_m32=True
 
 build:androidcommon --cxxopt='-Wno-invalid-offsetof' --extra_toolchains=@androidndk//:all
+
+# build targets begin
 build:android32 --config=m32 --config=androidcommon --platforms=//:android_armeabi-v7a
-build:android --config=m64 --config=androidcommon --platforms=//:android_arm64-v8a
+build:android64 --config=m64 --config=androidcommon --platforms=//:android_arm64-v8a
 build:androidx64 --config=m64 --config=androidcommon --platforms=//:android_x86-64
+build:linux64 --config=m64
+build:win64 --config=m64
+# build targets end
 
 # configuration used for performance profiling
 build:profile --config=thin-lto
