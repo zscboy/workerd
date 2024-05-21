@@ -598,7 +598,6 @@ new_local_repository(
 RULES_ANDROID_NDK_COMMIT= "1ed5be3498d20c8120417fe73b6a5f2b4a3438cc"
 RULES_ANDROID_NDK_SHA = "sha256-8ji0sDI/HgAopKPxCTV01w8IeGf0spYmRpoR6q+f1j8="
 
-#load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 http_archive(
     name = "rules_android_ndk",
     url = "https://github.com/bazelbuild/rules_android_ndk/archive/%s.zip" % RULES_ANDROID_NDK_COMMIT,
@@ -614,8 +613,8 @@ android_ndk_repository(
     api_level = 23,
 )
 
-register_toolchains("@androidndk//:all")
+#register_toolchains("@androidndk//:all")
 
-register_toolchains(
-    "//toolchain:cc_toolchain_for_linux_x86_32"
-)
+#register_toolchains(
+#    "//toolchain:cc_toolchain_for_linux_x86_32"
+#)

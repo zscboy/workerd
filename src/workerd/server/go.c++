@@ -284,6 +284,9 @@ kj::String WorkerdGoRuntime::onJsonCall(const char* jsonString) {
       } else if (method == ("destroyWorkerd")) {
         // destroy worker-d instance and free its resource
         callResult = onDestroyWorkerd(args);
+      }  else if (method == ("queryWorkerd")) {
+        // query workerd instance state
+        callResult = onQueryWorkerd(args);
       } else {
         callResult = kj::str("{\"code\":-1,\"msg\":\"unknown method:", method, "\"}");
       }
@@ -394,6 +397,43 @@ kj::String WorkerdGoRuntime::onDestroyWorkerd(const kj::String& args) {
   return kj::str("{\"code\":0}");
 }
 
+kj::String WorkerdGoRuntime::onQueryWorkerd(const kj::String& args) {
+  capnp::MallocMessageBuilder inputMessage;
+  capnp::JsonCodec json;
+  json.handleByAnnotation<gox::QueryWorkerdInput>();
+  kj::StringPtr input = args;
+  auto msgBuilder = inputMessage.initRoot<gox::QueryWorkerdInput>();
+  try {
+    json.decode(input, msgBuilder);
+  } catch (kj::Exception& ex) {
+    auto kjstr = kj::str("{\"code\":-1,\"msg\":\"", ex.getDescription(),"\"}");
+    return kjstr;
+  }
+
+  auto id = kj::str(msgBuilder.getId());
+
+  // check if exists
+  auto entry = mWorkerds.findEntry(id);
+  auto& ee = KJ_UNWRAP_OR(entry, {
+    auto kjstr = kj::str("{\"code\":-1,\"msg\":\"", "workerd with id:", id, " not exists", "\"}");
+    return kjstr;
+  });
+
+  capnp::MallocMessageBuilder message;
+  auto output = message.getRoot<gox::QueryWorkerdOutput>();
+  output.setCode(0);
+  auto error = ee.value->error();
+  if (error.size() != 0) {
+    output.setError(error);
+    output.setState(1);
+  } else {
+    output.setState(0);
+  }
+
+  auto outputStr = json.encode(output);
+  return outputStr;
+}
+
 void WorkerdGoRuntime::reportEvent(const kj::String& event) {
   if (mReportURL.size() == 0) {
     return;
@@ -455,8 +495,8 @@ void testCreateWorkerd1(void) {
   capnp::MallocMessageBuilder message;
   capnp::JsonCodec json;
   auto createWorkerdInput = message.getRoot<gox::CreateWorkerdInput>();
-  createWorkerdInput.setDirectory("/home/abc/titan/workerd/samples/helloworld");
-  createWorkerdInput.setConfigFile("config2.capnp");
+  createWorkerdInput.setDirectory("/home/abc/echoproj");
+  createWorkerdInput.setConfigFile("config.capnp");
   createWorkerdInput.setId("af00b595-81fd-4602-aa36-6f49b912cec7");
 
   auto input2 = json.encode(createWorkerdInput);
@@ -545,6 +585,29 @@ void testDestroyWorkerd2(void) {
   workerdGoFreeHeapStrPtr(ptrResult);
 }
 
+void testQueryWorkerd(void) {
+  using namespace workerd::server;
+
+  capnp::MallocMessageBuilder message;
+  capnp::JsonCodec json;
+  auto queryWorkerdInput = message.getRoot<gox::QueryWorkerdInput>();
+  queryWorkerdInput.setId("af00b595-81fd-4602-aa36-6f49b912cec7");
+
+  auto input2 = json.encode(queryWorkerdInput);
+
+  auto jcInput = message.getRoot<gox::JSONCallInput>();
+  jcInput.setMethod("queryWorkerd");
+  jcInput.setArgs(input2);
+
+  auto inputStr = json.encode(jcInput);
+  auto input = inputStr.cStr();
+  const char* ptrResult = workerdGoRuntimeJsonCall(input);
+  int length = strnlen(ptrResult, 256);
+
+  KJ_LOG(INFO, kj::str("queryWorkerd result: ", ptrResult, ", len:", length));
+  workerdGoFreeHeapStrPtr(ptrResult);
+}
+
 int main(int argc, char* argv[]) {
   kj::_::Debug::setLogLevel(kj::LogSeverity::INFO);
 
@@ -562,6 +625,8 @@ int main(int argc, char* argv[]) {
       testDestroyWorkerd1();
     } else if (in == "d2") {
       testDestroyWorkerd2();
+    } else if (in == "q1") {
+      testQueryWorkerd();
     } else if (in == "quit") {
       break;
     } else {
