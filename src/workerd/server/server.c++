@@ -3604,6 +3604,7 @@ kj::Promise<void> Server::listenOnSockets(config::Config::Reader config,
         }
       }
       socketOverrides.erase(override);
+      KJ_LOG(INFO, kj::str("Server listenOnSockets, override: ", name, ", addrStr:", addrStr));
     } else if (sock.hasAddress()) {
       addrStr = sock.getAddress();
     } else {

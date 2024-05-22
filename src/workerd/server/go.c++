@@ -1,6 +1,5 @@
 #include "go.h"
 #include <capnp/compat/json.h>
-#include <workerd/server/gox.capnp.h>
 #include <string.h>
 #include <kj/timer.h>
 #include "server.h"
@@ -52,6 +51,8 @@ kj::Maybe<kj::Own<capnp::SchemaFile>> tryImportBulitin(kj::StringPtr name) {
 }
 
 int GoWorkerd::init(void) {
+  int socketCnt = 0;
+  kj::StringPtr socketName;
   kj::Maybe<kj::Exception> maybeException = kj::runCatchingExceptions([&]() {
     auto path = kj::Path(nullptr);
     path = path.evalNative(mDir);
@@ -60,7 +61,11 @@ int GoWorkerd::init(void) {
     parseConfigFile(path.toString(true));
 
     // ensure we have at least one top-level config object
-    (void)getConfig();
+    auto config = getConfig();
+    for (auto sock: config.getSockets()) {
+      socketCnt++;
+      socketName = sock.getName();
+    }
   });
 
   KJ_IF_SOME(e, maybeException) {
@@ -72,6 +77,16 @@ int GoWorkerd::init(void) {
   // maybe config has error, 'mError' set by 'reportParsingError'
   if (mError.size() > 0) {
     // error occurs
+    return -1;
+  }
+
+  if (socketCnt > 1) {
+    mError = kj::str("GoWorkerd::init config file has more than 1 sockets: ", socketCnt);
+    return -1;
+  }
+
+  if (socketCnt > 0 && (socketName == nullptr || socketName.size() == 0)) {
+    mError = kj::str("GoWorkerd::init config file socket has no name");
     return -1;
   }
 
@@ -183,7 +198,18 @@ void GoWorkerd::serveImpl() {
                 KJ_LOG(ERROR, kj::str("GoWorkerd server error occurs, id: ", mId, ", error:", mError));
               });
 
+    kj::StringPtr name;
+    for (auto sock: config.getSockets()) {
+      name = sock.getName();
+      break;
+    }
+
+    if (name != nullptr && name.size() > 0) {
+      server->overrideSocket(kj::str(name), kj::str(mAddr));
+    }
+
     auto func = [&](jsg::V8System& v8System, config::Config::Reader config) {
+
   #if _WIN32
         return server->run(v8System, config);
   #else
@@ -241,12 +267,16 @@ void GoWorkerd::stopServeThread() {
 }
 
 kj::String WorkerdGoRuntime::onJsonCall(const char* jsonString) {
+#if __linux__
   kj::Duration timeout = 5 * kj::SECONDS;
   auto maybelock = mLock.lockExclusiveWithTimeout(timeout);
 
   if (maybelock == kj::none) {
     return kj::str("{\"code\":-1,\"msg\":\"lock timeout\"}");
   }
+#else
+  auto maybelock = mLock.lockExclusive();
+#endif
 
   capnp::MallocMessageBuilder inputMessage;
   capnp::JsonCodec json;
@@ -350,10 +380,13 @@ kj::String WorkerdGoRuntime::onCeateWorkerd(const kj::String& args) {
     return kjstr;
   }
 
-  auto dir = kj::str(msgBuilder.getDirectory());
-  auto configFile = kj::str(msgBuilder.getConfigFile());
+  auto addr = msgBuilder.getSocketAddr();
+  if (addr == nullptr || addr.size() == 0) {
+    auto kjstr = kj::str("{\"code\":-1,\"msg\":\"", "workerd must provide socket addr", "\"}");
+    return kjstr;
+  }
 
-  auto workerd = kj::heap<GoWorkerd>(id, dir, configFile, *mV8System);
+  auto workerd = kj::heap<GoWorkerd>(msgBuilder, *mV8System);
   if (0 != workerd->init()) {
     auto kjstr = kj::str("{\"code\":-1,\"msg\":\"", "create workerd failed:", workerd->error(), "\"}");
     return kjstr;
@@ -498,6 +531,7 @@ void testCreateWorkerd1(void) {
   createWorkerdInput.setDirectory("/home/abc/echoproj");
   createWorkerdInput.setConfigFile("config.capnp");
   createWorkerdInput.setId("af00b595-81fd-4602-aa36-6f49b912cec7");
+  createWorkerdInput.setSocketAddr("127.0.0.1:8080");
 
   auto input2 = json.encode(createWorkerdInput);
 
@@ -546,6 +580,7 @@ void testCreateWorkerd2(void) {
   createWorkerdInput.setDirectory("/home/abc/titan/workerd/samples/helloworld");
   createWorkerdInput.setConfigFile("config.capnp");
   createWorkerdInput.setId("af00b595-81fd-4602-aa36-6f49b912cec8");
+  createWorkerdInput.setSocketAddr("127.0.0.1:8060");
 
   auto input2 = json.encode(createWorkerdInput);
 
