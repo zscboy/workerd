@@ -138,11 +138,10 @@ Server::~Server() noexcept(false) {
   //   httpclient destructor need to 'access' "internet"_kj service object.
   auto entry = services.findEntry("internet"_kj);
   KJ_IF_SOME(ee, entry) {
-    services.erase(ee);
+    auto entry2 = services.release(ee);
+    // destruct all other services except "internet"_kj
+    services.clear();
   }
-
-  // destruct all other services except "internet"_kj
-  services.clear();
 }
 
 struct Server::GlobalContext {
