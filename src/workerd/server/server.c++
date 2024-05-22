@@ -132,7 +132,18 @@ Server::Server(kj::Filesystem& fs, kj::Timer& timer, kj::Network& network,
       reportConfigError(kj::mv(reportConfigError)), consoleMode(consoleMode),
       memoryCacheProvider(kj::heap<api::MemoryCacheProvider>()), tasks(*this) {}
 
-Server::~Server() noexcept(false) {}
+Server::~Server() noexcept(false) {
+  // lingh: "internet"_kj service should destruct after worker service
+  //   When actor's io-context destruct, its httpclient object will destruct,
+  //   httpclient destructor need to 'access' "internet"_kj service object.
+  auto entry = services.findEntry("internet"_kj);
+  KJ_IF_SOME(ee, entry) {
+    services.erase(ee);
+  }
+
+  // destruct all other services except "internet"_kj
+  services.clear();
+}
 
 struct Server::GlobalContext {
   jsg::V8System& v8System;
