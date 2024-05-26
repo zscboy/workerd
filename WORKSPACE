@@ -43,6 +43,7 @@ http_archive(
     patches = [
         "//:patches/capnp-cpp/0001-remove-libpthread-for-android-build.patch",
         "//:patches/capnp-cpp/0002-memfd-create-for-android-build.patch",
+        "//:patches/capnp-cpp/0003-enable-keepalive-for-tcp.patch",
     ],
     sha256 = "21ae72a199a995b72e9bd359d4815539158d93a15cf36e284ef201fde7338c3c",
     strip_prefix = "capnproto-capnproto-8ba7a6e/c++",

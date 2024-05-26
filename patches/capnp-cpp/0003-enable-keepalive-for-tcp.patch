@@ -1,0 +1,99 @@
+From f19745dc0479b0d93dfb55f2a2aa4e1c6fbfc0b3 Mon Sep 17 00:00:00 2001
+From: lghchinaidea <lghchinaidea@gmail.com>
+Date: Mon, 27 May 2024 06:59:47 +0800
+Subject: [PATCH] set keepalive for all sockets
+
+---
+ src/kj/async-io-unix.c++  | 25 +++++++++++++++++++++++++
+ src/kj/async-io-win32.c++ | 18 ++++++++++++++++++
+ 2 files changed, 43 insertions(+)
+
+diff --git a/src/kj/async-io-unix.c++ b/src/kj/async-io-unix.c++
+index dd01a418..2fa62762 100644
+--- a/src/kj/async-io-unix.c++
++++ b/src/kj/async-io-unix.c++
+@@ -885,6 +885,27 @@ constexpr size_t AsyncStreamFd::MAX_SPLICE_LEN;
+ #endif  // __linux__ && !__ANDROID__
+
+ // =======================================================================================
++static void setTimeoutForSocket(int fd) {
++  int one = 1;
++  int keepcnt = 3;
++  int keepidle = 5;
++  int keepintvl = 3;
++  KJ_SYSCALL(setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, &one , sizeof(one)));
++  KJ_SYSCALL(setsockopt(fd, IPPROTO_TCP, TCP_KEEPIDLE, &keepidle, sizeof(keepidle)));
++  KJ_SYSCALL(setsockopt(fd, IPPROTO_TCP, TCP_KEEPCNT, &keepcnt, sizeof(keepcnt)));
++  KJ_SYSCALL(setsockopt(fd, IPPROTO_TCP, TCP_KEEPINTVL, &keepintvl, sizeof(keepintvl)));
++
++  // MACOS: use TCP_CONNECTIONTIMEOUT instead of TCP_USER_TIMEOUT
++#if __APPLE__ || __FreeBSD__
++#define TCP_USER_TIMEOUT TCP_CONNECTIONTIMEOUT
++#endif
++
++  // https://blog.cloudflare.com/when-tcp-sockets-refuse-to-die
++  int tcp_timeout = (keepidle + keepcnt * keepintvl)*1000;
++  KJ_SYSCALL(setsockopt(fd, IPPROTO_TCP , TCP_USER_TIMEOUT, &tcp_timeout, sizeof(tcp_timeout)));
++
++  KJ_LOG(INFO, "set timeout and keepalive for socket", fd);
++}
+
+ class SocketAddress {
+ public:
+@@ -927,6 +948,7 @@ public:
+       int one = 1;
+       KJ_SYSCALL(setsockopt(
+           result, IPPROTO_TCP, TCP_NODELAY, (char*)&one, sizeof(one)));
++	  setTimeoutForSocket(result);
+     }
+
+     return result;
+@@ -1365,6 +1387,9 @@ public:
+             KJ_FAIL_SYSCALL("setsocketopt(IPPROTO_TCP, TCP_NODELAY)", error);
+         }
+
++		// TODO: only work for TCP socket
++		setTimeoutForSocket(ownFd.get());
++
+         AuthenticatedStream result;
+         result.stream = heap<AsyncStreamFd>(eventPort, ownFd.release(), NEW_FD_FLAGS,
+                                             UnixEventPort::FdObserver::OBSERVE_READ_WRITE);
+diff --git a/src/kj/async-io-win32.c++ b/src/kj/async-io-win32.c++
+index 93336708..e31d8524 100644
+--- a/src/kj/async-io-win32.c++
++++ b/src/kj/async-io-win32.c++
+@@ -453,6 +453,23 @@ private:
+ };
+
+ // =======================================================================================
++static void setTimeoutForSocket(SOCKET fd) {
++  BOOL one = 1;
++  DWORD keepcnt = 3;
++  DWORD keepidle = 5;
++  DWORD keepintvl = 3;
++  KJ_WINSOCK(setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, (char*)&one , sizeof(one)));
++  KJ_WINSOCK(setsockopt(fd, IPPROTO_TCP, TCP_KEEPIDLE, (char*)&keepidle, sizeof(keepidle)));
++  KJ_WINSOCK(setsockopt(fd, IPPROTO_TCP, TCP_KEEPCNT, (char*)&keepcnt, sizeof(keepcnt)));
++  KJ_WINSOCK(setsockopt(fd, IPPROTO_TCP, TCP_KEEPINTVL, (char*)&keepintvl, sizeof(keepintvl)));
++
++  // there is no TCP_USER_TIMEOUT on windows platform
++  // https://blog.cloudflare.com/when-tcp-sockets-refuse-to-die
++  //int tcp_timeout = (keepidle + keepcnt * keepintvl)*1000;
++  //KJ_WINSOCK(setsockopt(fd, IPPROTO_TCP , TCP_USER_TIMEOUT, &tcp_timeout, sizeof(tcp_timeout)));
++
++  KJ_LOG(INFO, "set timeout and keepalive for socket", fd);
++}
+
+ class SocketAddress {
+ public:
+@@ -494,6 +511,7 @@ public:
+       //   specifies whether to pass MSG_MORE.
+       BOOL one = TRUE;
+       KJ_WINSOCK(setsockopt(result, IPPROTO_TCP, TCP_NODELAY, (char*)&one, sizeof(one)));
++	  setTimeoutForSocket(result);
+     }
+
+     return result;
+--
+2.36.0.windows.1
+
