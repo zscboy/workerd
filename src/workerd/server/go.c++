@@ -34,8 +34,21 @@ const char* workerdGoRuntimeJsonCall(const char* jsonString) {
     return heepStrPtr("{\"code\":-1,\"msg\":\"null json object\"}");
   }
 
-  auto callResult = runtime.onJsonCall(jsonString);
-  return heepStrPtr(callResult.cStr(), callResult.size());
+  kj::Maybe<kj::String> result = kj::none;
+  kj::Maybe<kj::Exception> maybeException = kj::runCatchingExceptions([&]() {
+    result = runtime.onJsonCall(jsonString);
+  });
+
+  KJ_IF_SOME(e, maybeException) {
+    // handle exception
+    result = kj::str("{\"code\":-1,\"msg\":\"", e.getDescription(), "\"}");
+  }
+
+  KJ_IF_SOME(callResult, result) {
+    return heepStrPtr(callResult.cStr(), callResult.size());
+  }
+
+  return heepStrPtr("{\"code\":-1,\"msg\":\"empty call result\"}");
 }
 
 namespace workerd::server {
