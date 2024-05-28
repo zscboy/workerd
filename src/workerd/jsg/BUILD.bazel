@@ -99,6 +99,7 @@ wd_cc_library(
     name = "exception",
     srcs = ["exception.c++"],
     hdrs = ["exception.h"],
+    #copts = ["-g"],
     visibility = ["//visibility:public"],
     deps = [
         "@capnp-cpp//src/kj",

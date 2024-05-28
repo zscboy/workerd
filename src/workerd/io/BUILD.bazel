@@ -89,6 +89,7 @@ wd_cc_library(
 
 wd_cc_library(
     name = "trace",
+    #copts = ["-g"],
     srcs = ["trace.c++"],
     hdrs = ["trace.h"],
     visibility = ["//visibility:public"],
@@ -122,6 +123,7 @@ wd_cc_library(
 
 wd_cc_library(
     name = "worker-interface",
+    #copts = ["-g"],
     srcs = ["worker-interface.c++"],
     hdrs = ["worker-interface.h"],
     visibility = ["//visibility:public"],

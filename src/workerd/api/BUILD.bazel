@@ -60,6 +60,7 @@ filegroup(
 #        ":html-rewriter",
 wd_cc_library(
     name = "rtti",
+    #copts = ["-g"],
     srcs = ["rtti.c++"],
     hdrs = [
         "modules.h",
