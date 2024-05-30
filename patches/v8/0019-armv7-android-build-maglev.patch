@@ -1,15 +1,14 @@
-From e9d6af07e4709f04d14f04f368b5b8ac89afac73 Mon Sep 17 00:00:00 2001
+From 33fa1b1f1ba64db77f82a380ea11c6bdc1dfa020 Mon Sep 17 00:00:00 2001
 From: lghchinaidea <lghchinaidea@gmail.com>
-Date: Sun, 12 May 2024 16:42:40 +0800
-Subject: [PATCH] build for armeabi-v7a, because arm defualt not enable maglev,
- we need add some header files
+Date: Fri, 31 May 2024 06:34:21 +0800
+Subject: [PATCH] Turboshaft's Maglev graph builder needs some Maglev files
 
 ---
- BUILD.bazel | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ BUILD.bazel | 52 ++++++++++++++++++++++++++--------------------------
+ 1 file changed, 26 insertions(+), 26 deletions(-)
 
 diff --git a/BUILD.bazel b/BUILD.bazel
-index 2351c1e3300..0c4d2987a89 100644
+index 2351c1e3300..c6872cc70d0 100644
 --- a/BUILD.bazel
 +++ b/BUILD.bazel
 @@ -3419,6 +3419,32 @@ filegroup(
@@ -42,6 +41,39 @@ index 2351c1e3300..0c4d2987a89 100644
 +            "src/maglev/maglev-ir-inl.h",
 +            "src/maglev/maglev-register-frame-array.h",
 +        ],
+     }),
+ )
+
+@@ -3512,32 +3538,6 @@ filegroup(
+             "src/builtins/builtins-wasm-gen.h",
+         ],
+         "//conditions:default": [],
+-    }) + select({
+-        # Turboshaft's Maglev graph builder needs some Maglev files. We only
+-        # include them explicitely when Maglev is disabled.
+-        ":enable_maglev": [],
+-        "//conditions:default": [
+-            "src/maglev/maglev-basic-block.h",
+-            "src/maglev/maglev-code-gen-state.h",
+-            "src/maglev/maglev-compilation-info.cc",
+-            "src/maglev/maglev-compilation-info.h",
+-            "src/maglev/maglev-compilation-unit.cc",
+-            "src/maglev/maglev-compilation-unit.h",
+-            "src/maglev/maglev-graph-builder.cc",
+-            "src/maglev/maglev-graph-builder.h",
+-            "src/maglev/maglev-graph.h",
+-            "src/maglev/maglev-graph-labeller.h",
+-            "src/maglev/maglev-graph-printer.cc",
+-            "src/maglev/maglev-graph-printer.h",
+-            "src/maglev/maglev-graph-processor.h",
+-            "src/maglev/maglev-graph-verifier.h",
+-            "src/maglev/maglev-interpreter-frame-state.cc",
+-            "src/maglev/maglev-interpreter-frame-state.h",
+-            "src/maglev/maglev-ir.cc",
+-            "src/maglev/maglev-ir.h",
+-            "src/maglev/maglev-ir-inl.h",
+-            "src/maglev/maglev-register-frame-array.h",
+-        ],
      }),
  )
 

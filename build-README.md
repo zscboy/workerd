@@ -32,4 +32,8 @@ build windows64:
   bazelisk build //src/workerd/server:goworkerd --config=thin-lto --config=win64
 
 v8 mksnapshots (run on target system)
+   # see v8/src/snapshot/embedded/platform-embedded-file-writer-base.cc for --target_os and --target_arch options
+   # on android, adb push mksnapshot executable to phone's /data/local/tmp/ directory, then chmod a+x, then run it
+   # note that android64 phone can run android32 executable
   ./mksnapshot --embedded_variant=Default --startup_src=snapshot.cc --embedded_src=embedded.S
+
