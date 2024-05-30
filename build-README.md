@@ -30,3 +30,6 @@ build windows64:
   bazelisk build //src/workerd/server:goworkerd --config=win64
   OR with thin-lto:
   bazelisk build //src/workerd/server:goworkerd --config=thin-lto --config=win64
+
+v8 mksnapshots (run on target system)
+  ./mksnapshot --embedded_variant=Default --startup_src=snapshot.cc --embedded_src=embedded.S

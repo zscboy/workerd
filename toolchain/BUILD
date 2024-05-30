@@ -30,7 +30,8 @@ toolchain(
 package(default_visibility = ["//visibility:public"])
 load(":cc_toolchain_config.bzl", "cc_toolchain_config")
 
-# copy from 'local_config_cc' directory
+# copy from 'BUILD' file in bazel.cache.external 'local_config_cc' directory
+
 cc_toolchain_config(
     name = "linux_x86_32_toolchain_config",
     cpu = "k8",
@@ -41,22 +42,22 @@ cc_toolchain_config(
     target_libc = "local",
     abi_version = "local",
     abi_libc_version = "local",
-    cxx_builtin_include_directories = ["/usr/lib/llvm-15/lib/clang/15.0.7/include",
+    cxx_builtin_include_directories = ["/usr/lib/llvm-18/lib/clang/18/include",
     "/usr/local/include",
     "/usr/include/x86_64-linux-gnu",
     "/usr/include",
-    "/usr/lib/llvm-15/lib/clang/15.0.7/share",
+    "/usr/lib/llvm-18/lib/clang/18/share",
     "/usr/include/c++/12",
     "/usr/include/x86_64-linux-gnu/c++/12",
     "/usr/include/c++/12/backward",
-    "/usr/lib/llvm-15/include/c++/v1",
+    "/usr/lib/llvm-18/include/c++/v1",
     "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"],
     tool_paths = {"ar": "/usr/bin/ar",
         "ld": "/usr/bin/ld",
         "llvm-cov": "None",
         "llvm-profdata": "None",
         "cpp": "/usr/bin/cpp",
-        "gcc": "/usr/lib/llvm-15/bin/clang",
+        "gcc": "/usr/lib/llvm-18/bin/clang",
         "dwp": "/usr/bin/dwp",
         "gcov": "/usr/bin/gcov",
         "nm": "/usr/bin/nm",
@@ -80,10 +81,11 @@ cc_toolchain_config(
     dbg_compile_flags = ["-g"],
     conly_flags = [],
     cxx_flags = ["-std=c++14"],
-    link_flags = ["-fuse-ld=/usr/bin/ld.gold",
-    "-B/usr/lib/llvm-15/bin",
+    link_flags = ["-fuse-ld=/usr/lib/llvm-18/bin/ld.lld",
+    "-B/usr/lib/llvm-18/bin",
     "-Wl,-no-as-needed",
     "-Wl,-z,relro,-z,now"],
+    #link_libs = ["-l:libc++.a -l:libc++abi.a -lm -static-libgcc"],
     link_libs = ["-Wl,--push-state,-as-needed",
     "-lstdc++",
     "-Wl,--pop-state",
