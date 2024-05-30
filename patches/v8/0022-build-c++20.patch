@@ -1,0 +1,47 @@
+From 6358c7a77f7f5d3603effe90a188c0c53a0e60c6 Mon Sep 17 00:00:00 2001
+From: lghchinaidea <lghchinaidea@gmail.com>
+Date: Thu, 30 May 2024 06:49:54 +0800
+Subject: [PATCH] build with c++20
+
+---
+ bazel/defs.bzl | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/bazel/defs.bzl b/bazel/defs.bzl
+index 1ea9bc0da8d..839b476cefa 100644
+--- a/bazel/defs.bzl
++++ b/bazel/defs.bzl
+@@ -114,6 +114,8 @@ def _default_args():
+                 "-Wno-builtin-assume-aligned-alignment",
+                 "-Wno-unused-parameter",
+                 "-Wno-implicit-int-float-conversion",
++                "-Wno-invalid-offsetof",
++                "-Wno-deprecated-this-capture",
+                 "-Wno-deprecated-copy",
+                 "-Wno-non-virtual-dtor",
+                 "-isystem .",
+@@ -122,7 +124,7 @@ def _default_args():
+         }) + select({
+             "@v8//bazel/config:is_clang": [
+                 "-Wno-invalid-offsetof",
+-                "-std=c++17",
++                "-std=c++20",
+             ],
+             "@v8//bazel/config:is_gcc": [
+                 "-Wno-extra",
+@@ -139,10 +141,10 @@ def _default_args():
+                 "-Wno-stringop-overflow",
+                 # Use GNU dialect, because GCC doesn't allow using
+                 # ##__VA_ARGS__ when in standards-conforming mode.
+-                "-std=gnu++17",
++                "-std=gnu++20",
+             ],
+             "@v8//bazel/config:is_windows": [
+-                "/std:c++17",
++                "/std:c++20",
+             ],
+             "//conditions:default": [],
+         }) + select({
+--
+2.36.0.windows.1
+

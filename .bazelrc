@@ -79,7 +79,11 @@ build:m32 --extra_execution_platforms=//:linux_x86
 build:m32 --extra_toolchains=//toolchain:cc_toolchain_for_linux_x86_32
 build:m32 --//:is_target_m64=False --//:is_target_m32=True
 
-build:androidcommon --cxxopt='-Wno-invalid-offsetof' --extra_toolchains=@androidndk//:all
+build:androidcommon --@v8//:v8_enable_short_builtin_calls=False
+build:androidcommon --linkopt='-llog'
+build:androidcommon --cxxopt='-DANDROID' --copt='-DANDROID'
+#build:androidcommon --cxxopt='-Wno-invalid-offsetof' --copt='-Wno-invalid-offsetof'
+build:androidcommon --extra_toolchains=@androidndk//:all
 
 # build targets begin
 build:android32 --config=m32 --config=androidcommon --platforms=//:android_armeabi-v7a

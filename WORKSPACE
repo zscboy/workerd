@@ -449,7 +449,7 @@ http_archive(
         "//:patches/v8/0005-Disable-bazel-whole-archive-build.patch",
         "//:patches/v8/0006-Make-v8-Locker-automatically-call-isolate-Enter.patch",
         "//:patches/v8/0007-Add-an-API-to-capture-and-restore-the-cage-base-poin.patch",
-        "//:patches/v8/0008-Speed-up-V8-bazel-build-by-always-using-target-cfg.patch",
+        #"//:patches/v8/0008-Speed-up-V8-bazel-build-by-always-using-target-cfg.patch",
         "//:patches/v8/0009-Implement-Promise-Context-Tagging.patch",
         "//:patches/v8/0010-Enable-V8-shared-linkage.patch",
         "//:patches/v8/0011-Randomize-the-initial-ExecutionContextId-used-by-the.patch",
@@ -459,11 +459,12 @@ http_archive(
         "//:patches/v8/0015-Add-ValueSerializer-SetTreatFunctionsAsHostObjects.patch",
         "//:patches/v8/0016-wasm-liftoff-arm64-Fix-LoadTaggedPointer.patch",
         "//:patches/v8/0017-platform-header-for-android-build.patch",
-        "//:patches/v8/0018-disable-static-assert-for-android-build.patch",
-        "//:patches/v8/0019-armv7-android-build.patch",
-        "//:patches/v8/0020-armv7-android-build-maglev.patch",
-        "//:patches/v8/0021-armv7-android-build-missing-typename.patch",
-        "//:patches/v8/0022-armv7-android-build-missing-google3.patch",
+        "//:patches/v8/0018-armv7-android-build.patch",
+        "//:patches/v8/0019-armv7-android-build-maglev.patch",
+        "//:patches/v8/0020-armv7-android-build-missing-typename.patch",
+        "//:patches/v8/0021-armv7-android-build-missing-google3.patch",
+        "//:patches/v8/0022-build-c++20.patch",
+        "//:patches/v8/0023-arm64-android-build-use-google3.patch",
     ],
     integrity = "sha256-QphdaJn35eZeo+qoayNFIgm02hX5WHjKf+pr3WXCiEs=",
     strip_prefix = "v8-12.3.219.10",
@@ -610,7 +611,7 @@ load("@rules_android_ndk//:rules.bzl", "android_ndk_repository")
 
 android_ndk_repository(
     name = "androidndk", # Required. Name *must* be "androidndk".
-    path = "/home/abc/android-ndk-r26c", # Optional. Can be omitted if `ANDROID_NDK_HOME` environment variable is set.
+    path = "/home/abc/android-ndk-r27-beta1/", # Optional. Can be omitted if `ANDROID_NDK_HOME` environment variable is set.
     api_level = 23,
 )
 
