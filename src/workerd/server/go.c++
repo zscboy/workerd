@@ -70,8 +70,11 @@ int GoWorkerd::init(void) {
     auto path = kj::Path(nullptr);
     path = path.evalNative(mDir);
     path = path.append(mConfigFile);
-
-    parseConfigFile(path.toString(true));
+    #if _WIN32
+        auto newPath = path.slice(1, path.size());
+        path = newPath.clone();
+    #endif
+    parseConfigFile(path.toString());
 
     // ensure we have at least one top-level config object
     auto config = getConfig();
