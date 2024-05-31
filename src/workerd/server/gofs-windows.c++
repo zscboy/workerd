@@ -1,6 +1,7 @@
 #include <kj/exception.h>
 #include <kj/memory.h>
 #include <kj/debug.h>
+#include <kj/encoding.h>
 
 #include <windows.h>
 #include <winioctl.h>
@@ -77,8 +78,17 @@ public:
   }
 
   Maybe<Own<const ReadableFile>> tryOpenFile(PathPtr path) const override {
+    auto pathStr2 = kj::str(rootDir,  "\\", path);
+    // KJ_LOG(INFO, kj::str("pathStr2: ", kj::str(pathStr2)));
+    // auto pathStr2 = kj::str(path);
+    auto pathArray = kj::encodeWideString(kj::str(pathStr2), true); // convert to wchar_t
+    for (auto c: pathArray) {
+      if (c == L'/') {
+        c = L'\\';
+      }
+    }
+
     HANDLE newHandle;
-    auto pathArray = path.forWin32Api(true);
     KJ_WIN32_HANDLE_ERRORS(newHandle = CreateFileW(
         pathArray.begin(),
         GENERIC_READ,
@@ -158,7 +168,7 @@ private:
 
 class GoDiskFilesystem final: public kj::Filesystem {
 public:
-  GoDiskFilesystem(kj::StringPtr root):rootDir(root) {
+  GoDiskFilesystem(kj::StringPtr root, kj::StringPtr drvie):rootDir(drvie) {
     rootPath = kj::str(root);
   }
 
@@ -182,7 +192,11 @@ private:
 };
 
 kj::Own<kj::Filesystem> newGoDiskFilesystem(kj::StringPtr root) {
-  return kj::heap<GoDiskFilesystem>(root);
+     auto path = kj::Path(nullptr);
+     path = path.evalNative(kj::str(root));
+     auto drive =  path.slice(0, 1);
+     auto relativePath =  path.slice(1, path.size());
+     return kj::heap<GoDiskFilesystem>(relativePath.toString(), drive.toString());
 }
 
 } // namespace workerd::server
