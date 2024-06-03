@@ -91,6 +91,10 @@ build:android64 --config=m64 --config=androidcommon --platforms=//:android_arm64
 build:androidx64 --config=m64 --config=androidcommon --platforms=//:android_x86-64
 build:linux64 --config=m64
 build:win64 --config=m64
+# lingh: for x64 linux host
+build:linux64 --host_cxxopt='-stdlib=libc++'
+build:linux64 --host_linkopt='-stdlib=libc++'
+
 # build targets end
 
 # configuration used for performance profiling
@@ -199,9 +203,6 @@ build:macos --copt='-femit-dwarf-unwind=no-compact-unwind'
 # lingh: host copt need not use 'llvm libc++'
 build:linux --cxxopt='-stdlib=libc++'
 build:linux --linkopt='-stdlib=libc++'
-# lingh: for x64 host
-build:m64 --host_cxxopt='-stdlib=libc++'
-build:m64 --host_linkopt='-stdlib=libc++'
 build:m64 --//:is_target_m64=True --//:is_target_m32=False
 build:linux --action_env=BAZEL_LINKLIBS='-l%:libc++.a -l%:libc++abi.a -lm -static-libgcc'
 
