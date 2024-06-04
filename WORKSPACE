@@ -46,6 +46,7 @@ http_archive(
         "//:patches/capnp-cpp/0001-remove-libpthread-for-android-build.patch",
         "//:patches/capnp-cpp/0002-memfd-create-for-android-build.patch",
         "//:patches/capnp-cpp/0003-enable-keepalive-for-tcp.patch",
+        "//:patches/capnp-cpp/0004-android-not-use-clang-tail.patch",
     ],
     type = "tgz",
     urls = ["https://github.com/capnproto/capnproto/tarball/8653ebc7751d5980e0009bdde80950c2b0935d33"],

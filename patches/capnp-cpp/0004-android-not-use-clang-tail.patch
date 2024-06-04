@@ -1,0 +1,25 @@
+From 3a0de061e1b03d30b64ce5fbce4d172f8ff9d114 Mon Sep 17 00:00:00 2001
+From: lghchinaidea <lghchinaidea@gmail.com>
+Date: Tue, 4 Jun 2024 17:19:29 +0800
+Subject: [PATCH] use NDK27-beta1 build for android32 will failed
+
+---
+ src/kj/common.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/kj/common.h b/src/kj/common.h
+index e96bec30..d39a532f 100644
+--- a/src/kj/common.h
++++ b/src/kj/common.h
+@@ -259,7 +259,7 @@ typedef unsigned char byte;
+ // by allowing a syntax like `[[clang::lifetimebound(*this)]]`.
+ // https://clang.llvm.org/docs/AttributeReference.html#lifetimebound
+
+-#if KJ_HAS_CPP_ATTRIBUTE(clang::musttail)
++#if KJ_HAS_CPP_ATTRIBUTE(clang::musttail) && !defined(__ANDROID__)
+ #define KJ_MUSTTAIL [[clang::musttail]]
+ #else
+ #define KJ_MUSTTAIL
+--
+2.36.0.windows.1
+

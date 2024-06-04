@@ -1,21 +1,27 @@
-From e899bc75d8eb0bb7320dd8f6c06776cbd0030a7b Mon Sep 17 00:00:00 2001
+From 672a6925c136af74a498ebc00a6455aa675de37c Mon Sep 17 00:00:00 2001
 From: lghchinaidea <lghchinaidea@gmail.com>
-Date: Mon, 27 May 2024 06:59:47 +0800
+Date: Tue, 4 Jun 2024 19:44:13 +0800
 Subject: [PATCH] set keepalive for all sockets
 
-(cherry picked from commit f19745dc0479b0d93dfb55f2a2aa4e1c6fbfc0b3)
 ---
- src/kj/async-io-unix.c++  | 25 +++++++++++++++++++++++++
- src/kj/async-io-win32.c++ | 18 ++++++++++++++++++
- 2 files changed, 43 insertions(+)
+ c++/src/kj/async-io-unix.c++  | 26 ++++++++++++++++++++++++++
+ c++/src/kj/async-io-win32.c++ | 18 ++++++++++++++++++
+ 2 files changed, 44 insertions(+)
 
-diff --git a/src/kj/async-io-unix.c++ b/src/kj/async-io-unix.c++
-index cbc378bf..1792b2af 100644
---- a/src/kj/async-io-unix.c++
-+++ b/src/kj/async-io-unix.c++
-@@ -885,6 +885,27 @@ constexpr size_t AsyncStreamFd::MAX_SPLICE_LEN;
+diff --git a/c++/src/kj/async-io-unix.c++ b/c++/src/kj/async-io-unix.c++
+index cbc378bf..a7baaa25 100644
+--- a/c++/src/kj/async-io-unix.c++
++++ b/c++/src/kj/async-io-unix.c++
+@@ -884,7 +884,29 @@ private:
+ constexpr size_t AsyncStreamFd::MAX_SPLICE_LEN;
  #endif  // __linux__ && !__ANDROID__
- 
+
++// MACOS: use TCP_CONNECTIONTIMEOUT instead of TCP_USER_TIMEOUT
++#if __APPLE__ || __FreeBSD__
++#define TCP_USER_TIMEOUT TCP_CONNECTIONTIMEOUT
++#define TCP_KEEPIDLE TCP_KEEPALIVE
++#endif
++
  // =======================================================================================
 +static void setTimeoutForSocket(int fd) {
 +  int one = 1;
@@ -27,45 +33,40 @@ index cbc378bf..1792b2af 100644
 +  KJ_SYSCALL(setsockopt(fd, IPPROTO_TCP, TCP_KEEPCNT, &keepcnt, sizeof(keepcnt)));
 +  KJ_SYSCALL(setsockopt(fd, IPPROTO_TCP, TCP_KEEPINTVL, &keepintvl, sizeof(keepintvl)));
 +
-+  // MACOS: use TCP_CONNECTIONTIMEOUT instead of TCP_USER_TIMEOUT
-+#if __APPLE__ || __FreeBSD__
-+#define TCP_USER_TIMEOUT TCP_CONNECTIONTIMEOUT
-+#endif
-+
 +  // https://blog.cloudflare.com/when-tcp-sockets-refuse-to-die
 +  int tcp_timeout = (keepidle + keepcnt * keepintvl)*1000;
 +  KJ_SYSCALL(setsockopt(fd, IPPROTO_TCP , TCP_USER_TIMEOUT, &tcp_timeout, sizeof(tcp_timeout)));
-+  
++
 +  KJ_LOG(INFO, "set timeout and keepalive for socket", fd);
 +}
- 
+
  class SocketAddress {
  public:
-@@ -927,6 +948,7 @@ public:
+@@ -927,6 +949,7 @@ public:
        int one = 1;
        KJ_SYSCALL(setsockopt(
            result, IPPROTO_TCP, TCP_NODELAY, (char*)&one, sizeof(one)));
 +	  setTimeoutForSocket(result);
      }
- 
+
      return result;
-@@ -1365,6 +1387,9 @@ public:
+@@ -1365,6 +1388,9 @@ public:
              KJ_FAIL_SYSCALL("setsocketopt(IPPROTO_TCP, TCP_NODELAY)", error);
          }
- 
+
 +		// TODO: only work for TCP socket
 +		setTimeoutForSocket(ownFd.get());
 +
          AuthenticatedStream result;
          result.stream = heap<AsyncStreamFd>(eventPort, ownFd.release(), NEW_FD_FLAGS,
                                              UnixEventPort::FdObserver::OBSERVE_READ_WRITE);
-diff --git a/src/kj/async-io-win32.c++ b/src/kj/async-io-win32.c++
+diff --git a/c++/src/kj/async-io-win32.c++ b/c++/src/kj/async-io-win32.c++
 index 9e337655..66c7afdf 100644
---- a/src/kj/async-io-win32.c++
-+++ b/src/kj/async-io-win32.c++
+--- a/c++/src/kj/async-io-win32.c++
++++ b/c++/src/kj/async-io-win32.c++
 @@ -453,6 +453,23 @@ private:
  };
- 
+
  // =======================================================================================
 +static void setTimeoutForSocket(SOCKET fd) {
 +  BOOL one = 1;
@@ -81,10 +82,10 @@ index 9e337655..66c7afdf 100644
 +  // https://blog.cloudflare.com/when-tcp-sockets-refuse-to-die
 +  //int tcp_timeout = (keepidle + keepcnt * keepintvl)*1000;
 +  //KJ_WINSOCK(setsockopt(fd, IPPROTO_TCP , TCP_USER_TIMEOUT, &tcp_timeout, sizeof(tcp_timeout)));
-+  
++
 +  KJ_LOG(INFO, "set timeout and keepalive for socket", fd);
 +}
- 
+
  class SocketAddress {
  public:
 @@ -494,6 +511,7 @@ public:
@@ -93,8 +94,8 @@ index 9e337655..66c7afdf 100644
        KJ_WINSOCK(setsockopt(result, IPPROTO_TCP, TCP_NODELAY, (char*)&one, sizeof(one)));
 +	  setTimeoutForSocket(result);
      }
- 
+
      return result;
--- 
+--
 2.36.0.windows.1
 

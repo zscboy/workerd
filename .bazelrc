@@ -110,6 +110,8 @@ build:linux64 --host_cxxopt='-stdlib=libc++'
 build:linux64 --host_linkopt='-stdlib=libc++'
 build:androidx64 --host_cxxopt='-stdlib=libc++'
 build:androidx64 --host_linkopt='-stdlib=libc++'
+build:android64 --host_cxxopt='-stdlib=libc++'
+build:android64 --host_linkopt='-stdlib=libc++'
 
 # build targets end
 
