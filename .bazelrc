@@ -108,6 +108,8 @@ build:win64 --config=m64
 # lingh: for x64 linux host
 build:linux64 --host_cxxopt='-stdlib=libc++'
 build:linux64 --host_linkopt='-stdlib=libc++'
+build:androidx64 --host_cxxopt='-stdlib=libc++'
+build:androidx64 --host_linkopt='-stdlib=libc++'
 
 # build targets end
 
