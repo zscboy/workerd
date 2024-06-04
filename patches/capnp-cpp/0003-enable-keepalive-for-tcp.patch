@@ -4,14 +4,14 @@ Date: Tue, 4 Jun 2024 19:44:13 +0800
 Subject: [PATCH] set keepalive for all sockets
 
 ---
- c++/src/kj/async-io-unix.c++  | 26 ++++++++++++++++++++++++++
- c++/src/kj/async-io-win32.c++ | 18 ++++++++++++++++++
+ src/kj/async-io-unix.c++  | 26 ++++++++++++++++++++++++++
+ src/kj/async-io-win32.c++ | 18 ++++++++++++++++++
  2 files changed, 44 insertions(+)
 
-diff --git a/c++/src/kj/async-io-unix.c++ b/c++/src/kj/async-io-unix.c++
+diff --git a/src/kj/async-io-unix.c++ b/src/kj/async-io-unix.c++
 index cbc378bf..a7baaa25 100644
---- a/c++/src/kj/async-io-unix.c++
-+++ b/c++/src/kj/async-io-unix.c++
+--- a/src/kj/async-io-unix.c++
++++ b/src/kj/async-io-unix.c++
 @@ -884,7 +884,29 @@ private:
  constexpr size_t AsyncStreamFd::MAX_SPLICE_LEN;
  #endif  // __linux__ && !__ANDROID__
@@ -60,10 +60,10 @@ index cbc378bf..a7baaa25 100644
          AuthenticatedStream result;
          result.stream = heap<AsyncStreamFd>(eventPort, ownFd.release(), NEW_FD_FLAGS,
                                              UnixEventPort::FdObserver::OBSERVE_READ_WRITE);
-diff --git a/c++/src/kj/async-io-win32.c++ b/c++/src/kj/async-io-win32.c++
+diff --git a/src/kj/async-io-win32.c++ b/src/kj/async-io-win32.c++
 index 9e337655..66c7afdf 100644
---- a/c++/src/kj/async-io-win32.c++
-+++ b/c++/src/kj/async-io-win32.c++
+--- a/src/kj/async-io-win32.c++
++++ b/src/kj/async-io-win32.c++
 @@ -453,6 +453,23 @@ private:
  };
 
