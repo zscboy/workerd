@@ -41,6 +41,12 @@ http_archive(
     name = "capnp-cpp",
     integrity = "sha256-74Mw9RvA8+zvopkQgG3tvtxFIXMpWjdtVYb32I6uFsw=",
     strip_prefix = "capnproto-capnproto-8653ebc/c++",
+    patch_args = ["-p1"],
+    patches = [
+        "//:patches/capnp-cpp/0001-remove-libpthread-for-android-build.patch",
+        "//:patches/capnp-cpp/0002-memfd-create-for-android-build.patch",
+        "//:patches/capnp-cpp/0003-enable-keepalive-for-tcp.patch",
+    ],
     type = "tgz",
     urls = ["https://github.com/capnproto/capnproto/tarball/8653ebc7751d5980e0009bdde80950c2b0935d33"],
 )
@@ -280,6 +286,7 @@ cc_library(
     copts = [
         "-w",
         "-Dverbose=-1",
+        "-std=c90",
     ] + select({
         "@platforms//os:linux": [ "-Wno-implicit-function-declaration" ],
         "@platforms//os:macos": [ "-Wno-implicit-function-declaration" ],
@@ -299,84 +306,84 @@ http_archive(
     urls = ["https://github.com/madler/zlib/releases/download/v1.3.1/zlib-1.3.1.tar.xz"],
 )
 
-http_file(
-    name = "cargo_bazel_linux_x64",
-    executable = True,
-    sha256 = "dffd5f2ceb91c5a6c0d0e8df5401160d6a5cf15511416b579c0c3936d22ccb8c",
-    urls = [
-        "https://github.com/bazelbuild/rules_rust/releases/download/0.42.1/cargo-bazel-x86_64-unknown-linux-gnu",
-    ],
-)
-
-http_file(
-    name = "cargo_bazel_linux_arm64",
-    executable = True,
-    sha256 = "490b52bd8407613c3aa69b9e3f52635a2fe7631ccb5c5bea9d8d0bc0adfa6d0f",
-    urls = [
-        "https://github.com/bazelbuild/rules_rust/releases/download/0.42.1/cargo-bazel-aarch64-unknown-linux-gnu",
-    ],
-)
-
-http_file(
-    name = "cargo_bazel_macos_x64",
-    executable = True,
-    sha256 = "cf873df6f03c94b95af567f5b9a6ff3e1528052cc89cabbee5a330e7c94b75c9",
-    urls = [
-        "https://github.com/bazelbuild/rules_rust/releases/download/0.42.1/cargo-bazel-x86_64-apple-darwin",
-    ],
-)
-
-http_file(
-    name = "cargo_bazel_macos_arm64",
-    executable = True,
-    sha256 = "983ba22850f1467484fb8a608fdc753e6c5203795edae20b0fc63c9b4f9b66aa",
-    urls = [
-        "https://github.com/bazelbuild/rules_rust/releases/download/0.43.0/cargo-bazel-aarch64-apple-darwin",
-    ],
-)
-
-http_file(
-    name = "cargo_bazel_win_x64",
-    downloaded_file_path = "downloaded.exe",  # .exe extension required for Windows to recognise as executable
-    executable = True,
-    sha256 = "dea1f912f7c432cd9f84bd2e7b4ad791e7ccfb0c01a6984ccc6498e0cc8be0a7",
-    urls = [
-        "https://github.com/bazelbuild/rules_rust/releases/download/0.42.1/cargo-bazel-x86_64-pc-windows-msvc.exe",
-    ],
-)
-
-# TODO(soon): rules_rust starts producing linker errors on Linux as of 0.39 through 0.42.1, try
-# upgrading it again later. This is likely due to https://github.com/bazelbuild/rules_rust/pull/2471.
-# The related cargo_bazel package has been updated already - some version mismatch between them is
-# acceptable since cargo_bazel is only used to generate build files.
-http_archive(
-    name = "rules_rust",
-    sha256 = "6501960c3e4da32495d1e1007ded0769a534cb195c30dea36aa54f9d8a3f0361",
-    urls = [
-        "https://github.com/bazelbuild/rules_rust/releases/download/0.38.0/rules_rust-v0.38.0.tar.gz",
-    ],
-)
-
-load("@rules_rust//rust:repositories.bzl", "rules_rust_dependencies", "rust_register_toolchains")
-
-rules_rust_dependencies()
-
-rust_register_toolchains(
-    edition = "2021",
-    versions = ["1.75.0"], # LLVM 17
-)
-
-load("@rules_rust//crate_universe:repositories.bzl", "crate_universe_dependencies")
-
-crate_universe_dependencies()
-
-load("//rust-deps/crates:crates.bzl", "crate_repositories")
-
-crate_repositories()
-
-load("@rules_rust//tools/rust_analyzer:deps.bzl", "rust_analyzer_dependencies")
-
-rust_analyzer_dependencies()
+#http_file(
+#    name = "cargo_bazel_linux_x64",
+#    executable = True,
+#    sha256 = "dffd5f2ceb91c5a6c0d0e8df5401160d6a5cf15511416b579c0c3936d22ccb8c",
+#    urls = [
+#        "https://github.com/bazelbuild/rules_rust/releases/download/0.42.1/cargo-bazel-x86_64-unknown-linux-gnu",
+#    ],
+#)
+#
+#http_file(
+#    name = "cargo_bazel_linux_arm64",
+#    executable = True,
+#    sha256 = "490b52bd8407613c3aa69b9e3f52635a2fe7631ccb5c5bea9d8d0bc0adfa6d0f",
+#    urls = [
+#        "https://github.com/bazelbuild/rules_rust/releases/download/0.42.1/cargo-bazel-aarch64-unknown-linux-gnu",
+#    ],
+#)
+#
+#http_file(
+#    name = "cargo_bazel_macos_x64",
+#    executable = True,
+#    sha256 = "cf873df6f03c94b95af567f5b9a6ff3e1528052cc89cabbee5a330e7c94b75c9",
+#    urls = [
+#        "https://github.com/bazelbuild/rules_rust/releases/download/0.42.1/cargo-bazel-x86_64-apple-darwin",
+#    ],
+#)
+#
+#http_file(
+#    name = "cargo_bazel_macos_arm64",
+#    executable = True,
+#    sha256 = "983ba22850f1467484fb8a608fdc753e6c5203795edae20b0fc63c9b4f9b66aa",
+#    urls = [
+#        "https://github.com/bazelbuild/rules_rust/releases/download/0.43.0/cargo-bazel-aarch64-apple-darwin",
+#    ],
+#)
+#
+#http_file(
+#    name = "cargo_bazel_win_x64",
+#    downloaded_file_path = "downloaded.exe",  # .exe extension required for Windows to recognise as executable
+#    executable = True,
+#    sha256 = "dea1f912f7c432cd9f84bd2e7b4ad791e7ccfb0c01a6984ccc6498e0cc8be0a7",
+#    urls = [
+#        "https://github.com/bazelbuild/rules_rust/releases/download/0.42.1/cargo-bazel-x86_64-pc-windows-msvc.exe",
+#    ],
+#)
+#
+## TODO(soon): rules_rust starts producing linker errors on Linux as of 0.39 through 0.42.1, try
+## upgrading it again later. This is likely due to https://github.com/bazelbuild/rules_rust/pull/2471.
+## The related cargo_bazel package has been updated already - some version mismatch between them is
+## acceptable since cargo_bazel is only used to generate build files.
+#http_archive(
+#    name = "rules_rust",
+#    sha256 = "6501960c3e4da32495d1e1007ded0769a534cb195c30dea36aa54f9d8a3f0361",
+#    urls = [
+#        "https://github.com/bazelbuild/rules_rust/releases/download/0.38.0/rules_rust-v0.38.0.tar.gz",
+#    ],
+#)
+#
+#load("@rules_rust//rust:repositories.bzl", "rules_rust_dependencies", "rust_register_toolchains")
+#
+#rules_rust_dependencies()
+#
+#rust_register_toolchains(
+#    edition = "2021",
+#    versions = ["1.75.0"], # LLVM 17
+#)
+#
+#load("@rules_rust//crate_universe:repositories.bzl", "crate_universe_dependencies")
+#
+#crate_universe_dependencies()
+#
+#load("//rust-deps/crates:crates.bzl", "crate_repositories")
+#
+#crate_repositories()
+#
+#load("@rules_rust//tools/rust_analyzer:deps.bzl", "rust_analyzer_dependencies")
+#
+#rust_analyzer_dependencies()
 
 # ========================================================================================
 # Node.js bootstrap
@@ -468,7 +475,7 @@ http_archive(
         "//:patches/v8/0004-Allow-Windows-builds-under-Bazel.patch",
         "//:patches/v8/0005-Disable-bazel-whole-archive-build.patch",
         "//:patches/v8/0006-Make-v8-Locker-automatically-call-isolate-Enter.patch",
-        "//:patches/v8/0007-Speed-up-V8-bazel-build-by-always-using-target-cfg.patch",
+        #"//:patches/v8/0007-Speed-up-V8-bazel-build-by-always-using-target-cfg.patch",
         "//:patches/v8/0008-Implement-Promise-Context-Tagging.patch",
         "//:patches/v8/0009-Enable-V8-shared-linkage.patch",
         "//:patches/v8/0010-Randomize-the-initial-ExecutionContextId-used-by-the.patch",
@@ -479,6 +486,13 @@ http_archive(
         "//:patches/v8/0015-Modify-where-to-look-for-fp16-dependency.-This-depen.patch",
         "//:patches/v8/0016-Expose-v8-Symbol-GetDispose.patch",
         "//:patches/v8/0017-Rename-V8_COMPRESS_POINTERS_IN_ISOLATE_CAGE-V8_COMPR.patch",
+        "//:patches/v8/0017-platform-header-for-android-build.patch",
+        "//:patches/v8/0018-armv7-android-build.patch",
+        "//:patches/v8/0019-armv7-android-build-maglev.patch",
+        "//:patches/v8/0020-armv7-android-build-missing-typename.patch",
+        "//:patches/v8/0021-armv7-android-build-missing-google3.patch",
+        "//:patches/v8/0022-build-c++20.patch",
+        "//:patches/v8/0023-arm64-android-build-use-google3.patch",
     ],
     integrity = "sha256-5gW+N4R+oVxzMZexrqgp14gU42bsFBc5RHPN2oOrTTw=",
     strip_prefix = "v8-12.6.228.9",
@@ -575,20 +589,46 @@ new_local_repository(
 )
 
 # rust-based lolhtml dependency, including the API header. See rust-deps for details.
-new_local_repository(
-    name = "com_cloudflare_lol_html",
-    build_file_content = """cc_library(
-        name = "lolhtml",
-        hdrs = ["@workerd//rust-deps:lol_html_api"],
-        deps = ["@workerd//rust-deps"],
-        # TODO(soon): This workaround appears to be needed when linking the rust library - figure
-        # out why and develop a better approach to address this.
-        linkopts = select({
-          "@platforms//os:windows": ["ntdll.lib"],
-          "//conditions:default": [""],
-        }),
-        include_prefix = "c-api/include",
-        strip_include_prefix = "c-api/include",
-        visibility = ["//visibility:public"],)""",
-    path = "empty",
+#new_local_repository(
+#    name = "com_cloudflare_lol_html",
+#    build_file_content = """cc_library(
+#        name = "lolhtml",
+#        hdrs = ["@workerd//rust-deps:lol_html_api"],
+#        deps = ["@workerd//rust-deps"],
+#        # TODO(soon): This workaround appears to be needed when linking the rust library - figure
+#        # out why and develop a better approach to address this.
+#        linkopts = select({
+#          "@platforms//os:windows": ["ntdll.lib"],
+#          "//conditions:default": [""],
+#        }),
+#        include_prefix = "c-api/include",
+#        strip_include_prefix = "c-api/include",
+#        visibility = ["//visibility:public"],)""",
+#    path = "empty",
+#)
+#
+
+#Or a later commit
+RULES_ANDROID_NDK_COMMIT= "1ed5be3498d20c8120417fe73b6a5f2b4a3438cc"
+RULES_ANDROID_NDK_SHA = "sha256-8ji0sDI/HgAopKPxCTV01w8IeGf0spYmRpoR6q+f1j8="
+
+http_archive(
+    name = "rules_android_ndk",
+    url = "https://github.com/bazelbuild/rules_android_ndk/archive/%s.zip" % RULES_ANDROID_NDK_COMMIT,
+    integrity = RULES_ANDROID_NDK_SHA,
+    strip_prefix = "rules_android_ndk-%s" % RULES_ANDROID_NDK_COMMIT,
 )
+
+load("@rules_android_ndk//:rules.bzl", "android_ndk_repository")
+
+android_ndk_repository(
+    name = "androidndk", # Required. Name *must* be "androidndk".
+    path = "/home/abc/android-ndk-r27-beta1/", # Optional. Can be omitted if `ANDROID_NDK_HOME` environment variable is set.
+    api_level = 23,
+)
+
+#register_toolchains("@androidndk//:all")
+
+#register_toolchains(
+#    "//toolchain:cc_toolchain_for_linux_x86_32"
+#)

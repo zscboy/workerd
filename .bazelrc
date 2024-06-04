@@ -17,13 +17,14 @@ common --noenable_bzlmod
 build --remote_download_all
 
 # Enable webgpu
-build --//src/workerd/io:enable_experimental_webgpu=True
+build --//src/workerd/io:enable_experimental_webgpu=False
 
 # Avoid generating duplicate runfile trees. This will become the default in a future bazel version.
 build --legacy_external_runfiles=false
 
+# lingh: comment out for android build
 # Flip this early to avoid breaking compatibility once it becomes the default.
-build --incompatible_disallow_empty_glob
+#build --incompatible_disallow_empty_glob
 
 # Dawn tint build flags
 build --@dawn//src/tint:tint_build_glsl_writer=False
@@ -79,6 +80,36 @@ common --@aspect_rules_ts//ts:default_to_tsc_transpiler
 build:thin-lto -c opt
 build:thin-lto --cxxopt='-flto=thin'
 build:thin-lto --linkopt='-flto=thin'
+# lingh
+build:thin-lto --cxxopt='-fvisibility=hidden'
+build:thin-lto --copt="-fvisibility=hidden"
+
+# lingh: 'm32' is dedicated to build for 'android_armeabi-v7a' target platform
+build:m32 --host_copt="-m32" --host_cxxopt="-m32"
+build:m32 --host_copt="-Wno-undefined-inline" --host_cxxopt="-Wno-undefined-inline"
+build:m32 --host_linkopt="-m32"
+build:m32 --host_linkopt="-latomic"
+build:m32 --extra_execution_platforms=//:linux_x86
+build:m32 --extra_toolchains=//toolchain:cc_toolchain_for_linux_x86_32
+build:m32 --//:is_target_m64=False --//:is_target_m32=True
+
+build:androidcommon --@v8//:v8_enable_short_builtin_calls=False
+build:androidcommon --linkopt='-llog'
+build:androidcommon --cxxopt='-DANDROID' --copt='-DANDROID'
+#build:androidcommon --cxxopt='-Wno-invalid-offsetof' --copt='-Wno-invalid-offsetof'
+build:androidcommon --extra_toolchains=@androidndk//:all
+
+# build targets begin
+build:android32 --config=m32 --config=androidcommon --platforms=//:android_armeabi-v7a
+build:android64 --config=m64 --config=androidcommon --platforms=//:android_arm64-v8a
+build:androidx64 --config=m64 --config=androidcommon --platforms=//:android_x86-64
+build:linux64 --config=m64
+build:win64 --config=m64
+# lingh: for x64 linux host
+build:linux64 --host_cxxopt='-stdlib=libc++'
+build:linux64 --host_linkopt='-stdlib=libc++'
+
+# build targets end
 
 # configuration used for performance profiling
 build:profile --config=thin-lto
@@ -117,24 +148,25 @@ build --cxxopt="-fbracket-depth=512" --host_cxxopt="-fbracket-depth=512"
 # Need to disable debug-assertions for fastbuild, should be off automatically for opt. As long as
 # rust-level LTO is not enabled, LLVM bitcode is not needed so -C embed-bitcode=n provides a free
 # improvement to build speed and rust-deps code size.
+
 # Using extra_rustc_flag for non-exec flags so they can be overwritten selectively.
-build --@rules_rust//:extra_rustc_flag=-Cembed-bitcode=n
-build --@rules_rust//:extra_rustc_flag=-Cpanic=abort
-build --@rules_rust//:extra_rustc_flag=-Cdebug-assertions=n
-build --@rules_rust//:extra_exec_rustc_flags=-C,panic=abort,-C,debug-assertions=n,-C,embed-bitcode=n
+#build --@rules_rust//:extra_rustc_flag=-Cembed-bitcode=n
+#build --@rules_rust//:extra_rustc_flag=-Cpanic=abort
+#build --@rules_rust//:extra_rustc_flag=-Cdebug-assertions=n
+#build --@rules_rust//:extra_exec_rustc_flags=-C,panic=abort,-C,debug-assertions=n,-C,embed-bitcode=n
 
 # We default to not enabling debug assertions and unwinding for Rust. For debug builds this is not
 # the right setting, but unfortunately we can't set that directly.
-build:rust-debug --@rules_rust//:extra_rustc_flag=-Cpanic=unwind
-build:rust-debug --@rules_rust//:extra_rustc_flag=-Cdebug-assertions=y
+#build:rust-debug --@rules_rust//:extra_rustc_flag=-Cpanic=unwind
+#build:rust-debug --@rules_rust//:extra_rustc_flag=-Cdebug-assertions=y
 # Use the equivalent of -g/-g2 for Rust here, this is necessary to get qualified stack traces while
 # -Zdebug-info-for-profiling is unavailable. Unlike gcc/clang, Rust defaults to -g3 otherwise.
-build:rust-debug --@rules_rust//:extra_rustc_flag=-Cdebuginfo=1
-build:rust-debug --@rules_rust//:extra_rustc_flag=-Cstrip=none
+#build:rust-debug --@rules_rust//:extra_rustc_flag=-Cdebuginfo=1
+#build:rust-debug --@rules_rust//:extra_rustc_flag=-Cstrip=none
 
 # Adding -C lto=thin here would improve binary size significantly – disable it for now due to
 # compile errors and wrong code generation when bazel and rust use different LLVM versions.
-build:thin-lto --@rules_rust//:extra_rustc_flag=-Ccodegen-units=1
+#build:thin-lto --@rules_rust//:extra_rustc_flag=-Ccodegen-units=1
 
 # common sanitizers options
 build:sanitizer-common --@workerd//src/workerd/server:use_tcmalloc=False
@@ -198,14 +230,18 @@ build:mac --experimental_objc_fastbuild_options=""
 
 # On Linux, always link libc++ statically to avoid compatibility issues with different OS versions.
 # macOS links with dynamic libc++ by default, which has good backwards compatibility.
-build:linux --cxxopt='-stdlib=libc++' --host_cxxopt='-stdlib=libc++'
-build:linux --linkopt='-stdlib=libc++' --host_linkopt='-stdlib=libc++'
-build:linux --action_env=BAZEL_LINKLIBS='-l%:libc++.a -lm -static-libgcc'
+#build:linux --cxxopt='-stdlib=libc++' --host_cxxopt='-stdlib=libc++'
+#build:linux --linkopt='-stdlib=libc++' --host_linkopt='-stdlib=libc++'
+# lingh: host copt need not use 'llvm libc++'
+build:linux --cxxopt='-stdlib=libc++'
+build:linux --linkopt='-stdlib=libc++'
+build:m64 --//:is_target_m64=True --//:is_target_m32=False
+build:linux --action_env=BAZEL_LINKLIBS='-l%:libc++.a -l%:libc++abi.a -lm -static-libgcc'
 
 # On Linux, enable PIC. In macos pic is the default, and the objc_library rule does not work
 # correctly if we use this flag since it will not find the object files to include
 # https://github.com/bazelbuild/bazel/issues/12439#issuecomment-914449079
-build:linux --force_pic
+#build:linux --force_pic
 
 # On Linux, garbage collection sections and optimize binary size. These do not apply to the macOS
 # toolchain.

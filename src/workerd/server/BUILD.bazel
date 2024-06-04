@@ -42,6 +42,7 @@ wd_cc_library(
 
 wd_cc_binary(
     name = "workerd",
+    #copts = ["-g"],
     srcs = ["workerd.c++"],
     malloc = ":malloc",
     tags = ["no-arm64"],
@@ -58,6 +59,70 @@ wd_cc_binary(
         "@platforms//os:windows": [],
         "//conditions:default": ["@workerd//src/workerd/util:symbolizer"],
     }),
+)
+
+wd_cc_binary(
+    name = "goworkerdx",
+    #copts = ["-g"],
+    srcs = ["go.h", "go.c++", "gofs.h"] + select({
+        "@platforms//os:windows": ["gofs-windows.c++"],
+        "//conditions:default": ["gofs-unix.c++"],
+    }),
+    malloc = ":malloc",
+    tags = ["no-arm64"],
+    #linkshared=1,
+    visibility = ["//visibility:public"],
+    deps = [
+        ":server",
+        ":workerd-meta_capnp",
+        ":workerd_capnp",
+        "//src/workerd/util:autogate",
+        "//src/workerd/util:perfetto",
+        "@capnp-cpp//src/capnp:capnpc",
+        "//src/pyodide:pyodide_extra_capnp",
+    ] + select({
+        "@platforms//os:windows": [],
+        "//conditions:default": ["@workerd//src/workerd/util:symbolizer"],
+    }) + select ({
+        "@//:m32h": [],
+        "@//:m64h": [],
+        },
+        no_match_error = "Please use --config=m32 for 32bits target or --config=m64 for 64bits targets",
+    ),
+)
+
+wd_cc_binary(
+    name = "goworkerd",
+    #copts = ["-g"],
+    srcs = ["go.h", "go.c++", "gofs.h"] + select({
+        "@platforms//os:windows": ["gofs-windows.c++"],
+        "//conditions:default": ["gofs-unix.c++"],
+    }),
+    malloc = ":malloc",
+    tags = ["no-arm64"],
+    linkshared=1,
+    linkopts=['-Wl,-soname=libgoworkerd.so'] + select({
+        "@platforms//os:android": ['-llog'],
+        "//conditions:default": [],
+    }),
+    visibility = ["//visibility:public"],
+    deps = [
+        ":server",
+        ":workerd-meta_capnp",
+        ":workerd_capnp",
+        "//src/workerd/util:autogate",
+        "//src/workerd/util:perfetto",
+        "@capnp-cpp//src/capnp:capnpc",
+        "//src/pyodide:pyodide_extra_capnp",
+    ] + select({
+        "@platforms//os:windows": [],
+        "//conditions:default": ["@workerd//src/workerd/util:symbolizer"],
+    }) + select ({
+        "@//:m32h": [],
+        "@//:m64h": [],
+        },
+        no_match_error = "Please use --config=m32 for 32bits target or --config=m64 for 64bits targets",
+    ),
 )
 
 wd_cc_library(
@@ -77,6 +142,7 @@ wd_cc_library(
     ],
 )
 
+# "//src/workerd/api:html-rewriter",
 wd_cc_library(
     name = "server",
     srcs = [
@@ -93,11 +159,11 @@ wd_cc_library(
         "//src/workerd/io:set_enable_experimental_webgpu": ["WORKERD_EXPERIMENTAL_ENABLE_WEBGPU"],
         "//conditions:default": [],
     }),
+    #copts = ["-g"],
     visibility = ["//visibility:public"],
     deps = [
         ":alarm-scheduler",
         ":workerd_capnp",
-        "//src/workerd/api:html-rewriter",
         "//src/workerd/api:pyodide",
         "//src/workerd/api:rtti",
         "//src/workerd/io",
@@ -108,7 +174,7 @@ wd_cc_library(
 
 wd_cc_capnp_library(
     name = "workerd_capnp",
-    srcs = ["workerd.capnp"],
+    srcs = ["workerd.capnp", "gox.capnp"],
     visibility = ["//visibility:public"],
     deps = [],
 )

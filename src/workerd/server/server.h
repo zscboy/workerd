@@ -37,7 +37,7 @@ public:
   Server(kj::Filesystem& fs, kj::Timer& timer, kj::Network& network,
          kj::EntropySource& entropySource, Worker::ConsoleMode consoleMode,
          kj::Function<void(kj::String)> reportConfigError);
-  ~Server() noexcept(false);
+  virtual ~Server() noexcept(false);
 
   // Permit experimental features to be used. These features may break backwards compatibility
   // in the future.

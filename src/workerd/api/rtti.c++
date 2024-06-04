@@ -15,7 +15,7 @@
 #include <workerd/api/encoding.h>
 #include <workerd/api/events.h>
 #include <workerd/api/global-scope.h>
-#include <workerd/api/html-rewriter.h>
+//#include <workerd/api/html-rewriter.h>
 #include <workerd/api/kv.h>
 #include <workerd/api/modules.h>
 #include <workerd/api/queue.h>
@@ -38,6 +38,8 @@
 #define EW_WEBGPU_ISOLATE_TYPES
 #endif
 
+//   F("html-rewriter", EW_HTML_REWRITER_ISOLATE_TYPES)
+
 #define EW_TYPE_GROUP_FOR_EACH(F)                                              \
   F("dom-exception", jsg::DOMException)                                        \
   F("global-scope", EW_GLOBAL_SCOPE_ISOLATE_TYPES)                             \
@@ -51,7 +53,6 @@
   F("encoding", EW_ENCODING_ISOLATE_TYPES)                                     \
   F("events", EW_EVENTS_ISOLATE_TYPES)                                         \
   F("form-data", EW_FORMDATA_ISOLATE_TYPES)                                    \
-  F("html-rewriter", EW_HTML_REWRITER_ISOLATE_TYPES)                           \
   F("http", EW_HTTP_ISOLATE_TYPES)                                             \
   F("kv", EW_KV_ISOLATE_TYPES)                                                 \
   F("queue", EW_QUEUE_ISOLATE_TYPES)                                           \

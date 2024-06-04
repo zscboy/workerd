@@ -37,6 +37,44 @@ platform(
     ],
 )
 
+platform(
+    name = "android_arm64-v8a",
+    constraint_values = [
+        "@platforms//os:android",
+        "@platforms//cpu:arm64",
+    ],
+)
+
+# use following cmd to build android_armeabi-v7a
+#   bazelisk build //src/workerd/server:goworkerd --config=thin-lto --config=m32 --platforms=//:android_armeabi-v7a
+# need gcc-multilib in host platform
+#   sudo apt-get install -y gcc-multilib
+platform(
+    name = "android_armeabi-v7a",
+    constraint_values = [
+        "@platforms//os:android",
+        "@platforms//cpu:armv7",
+    ],
+)
+
+platform(
+    name = "android_x86-64",
+    constraint_values = [
+        "@platforms//os:android",
+        "@platforms//cpu:x86_64",
+    ],
+)
+
+# for build android_armeabi-v7a, used in '.bazelrc'
+#  build:m32 --extra_execution_platforms=//:linux_x86
+platform(
+    name = "linux_x86",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_32",
+    ],
+)
+
 # bazel enables the --ffunction-sections, --gc-sections flags used to remove dead code by default
 # on Linux opt builds. Enable the equivalent macOS flag -Wl,-dead_strip here to work around bazel
 # idiosyncrasies.
@@ -73,4 +111,94 @@ selects.config_setting_group(
 selects.config_setting_group(
     name = "use_dead_strip",
     match_all = ["@platforms//os:macos", ":set_dead_strip", ":not_dbg_build"],
+)
+
+config_setting(
+    name = "android-arm",
+    constraint_values = [
+        "@platforms//os:android",
+        "@platforms//cpu:armv7",
+    ],
+)
+
+config_setting(
+    name = "android-arm64",
+    constraint_values = [
+        "@platforms//os:android",
+        "@platforms//cpu:arm64",
+    ],
+)
+
+config_setting(
+    name = "android-x64",
+    constraint_values = [
+        "@platforms//os:android",
+        "@platforms//cpu:x86_64",
+    ],
+)
+
+config_setting(
+    name = "linux-x64",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+)
+
+config_setting(
+    name = "windows-x64",
+    constraint_values = [
+        "@platforms//os:windows",
+        "@platforms//cpu:x86_64",
+    ],
+)
+
+
+config_setting(
+    name = "macos-x64",
+    constraint_values = [
+        "@platforms//os:macos",
+        "@platforms//cpu:x86_64",
+    ],
+)
+
+
+selects.config_setting_group(
+    name = "target32",
+    match_any = [":android-arm"],
+)
+
+selects.config_setting_group(
+    name = "target64",
+    match_any = [":android-arm64", ":android-x64", ":linux-x64", ":windows-x64", ":macos-x64"],
+)
+
+bool_flag(
+    name = "is_target_m32",
+    build_setting_default = False,
+)
+
+bool_flag(
+    name = "is_target_m64",
+    build_setting_default = False,
+)
+
+config_setting(
+    name = "m64flag",
+    flag_values = {"is_target_m64": "True"},
+)
+
+config_setting(
+    name = "m32flag",
+    flag_values = {"is_target_m32": "True"},
+)
+
+selects.config_setting_group(
+    name = "m64h",
+    match_all = [":target64", ":m64flag"],
+)
+
+selects.config_setting_group(
+    name = "m32h",
+    match_all = [":target32", ":m32flag"],
 )

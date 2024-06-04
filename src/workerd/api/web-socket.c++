@@ -329,8 +329,13 @@ kj::Promise<DeferredProxy<void>> WebSocket::couple(kj::Own<kj::WebSocket> other)
 
   auto& context = IoContext::current();
 
-  auto upstream = other->pumpTo(*self);
-  auto downstream = self->pumpTo(*other);
+  auto upstream = other->pumpTo(*self).catch_([](kj::Exception&& ee) {
+    KJ_LOG(ERROR, "websocket upstream exception", ee.getDescription());
+  });
+
+  auto downstream = self->pumpTo(*other).catch_([](kj::Exception&& ee) {
+    KJ_LOG(ERROR, "websocket downstream exception", ee.getDescription());
+  });
 
   if (locality == LOCAL) {
     // We're terminating the WebSocket in this worker, so the upstream promise (which pumps
