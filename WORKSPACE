@@ -488,8 +488,6 @@ http_archive(
         "//:patches/v8/0017-Rename-V8_COMPRESS_POINTERS_IN_ISOLATE_CAGE-V8_COMPR.patch",
         "//:patches/v8/0017-platform-header-for-android-build.patch",
         "//:patches/v8/0018-armv7-android-build.patch",
-        "//:patches/v8/0019-armv7-android-build-maglev.patch",
-        "//:patches/v8/0020-armv7-android-build-missing-typename.patch",
         "//:patches/v8/0021-armv7-android-build-missing-google3.patch",
         "//:patches/v8/0022-build-c++20.patch",
         "//:patches/v8/0023-arm64-android-build-use-google3.patch",

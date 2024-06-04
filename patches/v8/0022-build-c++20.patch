@@ -1,17 +1,18 @@
-From 6358c7a77f7f5d3603effe90a188c0c53a0e60c6 Mon Sep 17 00:00:00 2001
+From 58bf83b9a9b18cd2d7e0cd1dcd00ee9ca2ace145 Mon Sep 17 00:00:00 2001
 From: lghchinaidea <lghchinaidea@gmail.com>
 Date: Thu, 30 May 2024 06:49:54 +0800
 Subject: [PATCH] build with c++20
 
+(cherry picked from commit 6358c7a77f7f5d3603effe90a188c0c53a0e60c6)
 ---
  bazel/defs.bzl | 8 +++++---
  1 file changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/bazel/defs.bzl b/bazel/defs.bzl
-index 1ea9bc0da8d..839b476cefa 100644
+index e142a3e7e8d..1261eac4194 100644
 --- a/bazel/defs.bzl
 +++ b/bazel/defs.bzl
-@@ -114,6 +114,8 @@ def _default_args():
+@@ -115,6 +115,8 @@ def _default_args():
                  "-Wno-builtin-assume-aligned-alignment",
                  "-Wno-unused-parameter",
                  "-Wno-implicit-int-float-conversion",
@@ -20,7 +21,7 @@ index 1ea9bc0da8d..839b476cefa 100644
                  "-Wno-deprecated-copy",
                  "-Wno-non-virtual-dtor",
                  "-isystem .",
-@@ -122,7 +124,7 @@ def _default_args():
+@@ -123,7 +125,7 @@ def _default_args():
          }) + select({
              "@v8//bazel/config:is_clang": [
                  "-Wno-invalid-offsetof",
@@ -29,7 +30,7 @@ index 1ea9bc0da8d..839b476cefa 100644
              ],
              "@v8//bazel/config:is_gcc": [
                  "-Wno-extra",
-@@ -139,10 +141,10 @@ def _default_args():
+@@ -140,10 +142,10 @@ def _default_args():
                  "-Wno-stringop-overflow",
                  # Use GNU dialect, because GCC doesn't allow using
                  # ##__VA_ARGS__ when in standards-conforming mode.
@@ -42,6 +43,6 @@ index 1ea9bc0da8d..839b476cefa 100644
              ],
              "//conditions:default": [],
          }) + select({
---
+-- 
 2.36.0.windows.1
 

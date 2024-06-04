@@ -1,3 +1,13 @@
+From 53bbed072b0c1e65c81fe01860f47d3a942190f5 Mon Sep 17 00:00:00 2001
+From: lghchinaidea <lghchinaidea@gmail.com>
+Date: Tue, 4 Jun 2024 10:54:15 +0800
+Subject: [PATCH] change include file style: use double quotation instead of
+ angle brackets
+
+---
+ src/base/debug/stack_trace_android.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
 diff --git a/src/base/debug/stack_trace_android.cc b/src/base/debug/stack_trace_android.cc
 index 16fbf9890c9..00334f13f02 100644
 --- a/src/base/debug/stack_trace_android.cc
@@ -5,9 +15,12 @@ index 16fbf9890c9..00334f13f02 100644
 @@ -12,7 +12,7 @@
  #include <string.h>
  #include <unwind.h>
-
+ 
 -#include <src/base/platform/platform.h>
 +#include "src/base/platform/platform.h"
-
+ 
  #include <iomanip>
  #include <ostream>
+-- 
+2.36.0.windows.1
+
