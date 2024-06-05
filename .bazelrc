@@ -17,6 +17,7 @@ common --noenable_bzlmod
 build --remote_download_all
 
 # Enable webgpu
+# lingh: Disalbe webgpu
 build --//src/workerd/io:enable_experimental_webgpu=False
 
 # Avoid generating duplicate runfile trees. This will become the default in a future bazel version.
@@ -80,7 +81,8 @@ common --@aspect_rules_ts//ts:default_to_tsc_transpiler
 build:thin-lto -c opt
 build:thin-lto --cxxopt='-flto=thin'
 build:thin-lto --linkopt='-flto=thin'
-# lingh
+
+# lingh: use 'hidden' for all symblos to reduce the size of output
 build:thin-lto --cxxopt='-fvisibility=hidden'
 build:thin-lto --copt="-fvisibility=hidden"
 
@@ -91,27 +93,34 @@ build:m32 --host_linkopt="-m32"
 build:m32 --host_linkopt="-latomic"
 build:m32 --extra_execution_platforms=//:linux_x86
 build:m32 --extra_toolchains=//toolchain:cc_toolchain_for_linux_x86_32
-build:m32 --//:is_target_m64=False --//:is_target_m32=True
 
+# lingh: force build action to provide m32/m64
+build:m32 --//:is_target_m64=False --//:is_target_m32=True
+build:m64 --//:is_target_m64=True --//:is_target_m32=False
+
+# lingh: android v8
 build:androidcommon --@v8//:v8_enable_short_builtin_calls=False
+# lingh: for v8 android build link to android-log-lib
 build:androidcommon --linkopt='-llog'
+# lingh: v8 bug: v8's code mix use 'ANDROID' and '__ANDROID__' macro
 build:androidcommon --cxxopt='-DANDROID' --copt='-DANDROID'
-#build:androidcommon --cxxopt='-Wno-invalid-offsetof' --copt='-Wno-invalid-offsetof'
 build:androidcommon --extra_toolchains=@androidndk//:all
 
-# build targets begin
+# lingh: android armv7 and armv8a specific config
 build:android32 --config=m32 --config=androidcommon --platforms=//:android_armeabi-v7a
 build:android64 --config=m64 --config=androidcommon --platforms=//:android_arm64-v8a
 build:androidx64 --config=m64 --config=androidcommon --platforms=//:android_x86-64
-build:linux64 --config=m64
-build:win64 --config=m64
-# lingh: for x64 linux host
+# lingh: for 64-linux host we use clang's stdlib, not gcc's. But for 32-linux, we need to use gcc's multi-lib
 build:linux64 --host_cxxopt='-stdlib=libc++'
 build:linux64 --host_linkopt='-stdlib=libc++'
 build:androidx64 --host_cxxopt='-stdlib=libc++'
 build:androidx64 --host_linkopt='-stdlib=libc++'
 build:android64 --host_cxxopt='-stdlib=libc++'
 build:android64 --host_linkopt='-stdlib=libc++'
+
+# lingh: linux64 and windows64
+build:linux64 --config=m64
+build:win64 --config=m64
 
 # build targets end
 
@@ -239,7 +248,6 @@ build:mac --experimental_objc_fastbuild_options=""
 # lingh: host copt need not use 'llvm libc++'
 build:linux --cxxopt='-stdlib=libc++'
 build:linux --linkopt='-stdlib=libc++'
-build:m64 --//:is_target_m64=True --//:is_target_m32=False
 build:linux --action_env=BAZEL_LINKLIBS='-l%:libc++.a -l%:libc++abi.a -lm -static-libgcc'
 
 # On Linux, enable PIC. In macos pic is the default, and the objc_library rule does not work
