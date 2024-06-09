@@ -467,7 +467,7 @@ npm_repositories()
 # fork), icu (Chromium fork), and trace_event, so we still have to use git for them.
 git_repository(
     name = "v8_prebuilt_snapshot",
-    branch = "main",
+	commit = "dd71925ddf33ff8a9b53da7699e90582ab9297d2",
     build_file_content = "exports_files(glob([\"**\"]))",
     remote = "https://github.com/linguohua/v8_prebuilt_snapshot.git"
 )
