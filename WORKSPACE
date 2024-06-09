@@ -465,6 +465,12 @@ npm_repositories()
 #
 # There is an official mirror for V8 itself on GitHub, but not for dependencies like zlib (Chromium
 # fork), icu (Chromium fork), and trace_event, so we still have to use git for them.
+git_repository(
+    name = "v8_prebuilt_snapshot",
+    branch = "main",
+    build_file_content = "exports_files(glob([\"**\"]))",
+    remote = "https://github.com/linguohua/v8_prebuilt_snapshot.git"
+)
 
 http_archive(
     name = "v8",
@@ -488,10 +494,9 @@ http_archive(
         "//:patches/v8/0016-Expose-v8-Symbol-GetDispose.patch",
         "//:patches/v8/0017-Rename-V8_COMPRESS_POINTERS_IN_ISOLATE_CAGE-V8_COMPR.patch",
         "//:patches/v8/0017-platform-header-for-android-build.patch",
-        "//:patches/v8/0018-armv7-android-build.patch",
-        "//:patches/v8/0021-armv7-android-build-missing-google3.patch",
-        "//:patches/v8/0022-build-c++20.patch",
-        "//:patches/v8/0023-arm64-android-build-use-google3.patch",
+        "//:patches/v8/0018-arm-to-armv7.patch",
+        "//:patches/v8/0019-use-prebuilt-snapshot-bazel.patch",
+        "//:patches/v8/0020-build-c++20.patch",
     ],
     integrity = "sha256-5gW+N4R+oVxzMZexrqgp14gU42bsFBc5RHPN2oOrTTw=",
     strip_prefix = "v8-12.6.228.9",

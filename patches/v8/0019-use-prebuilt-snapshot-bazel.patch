@@ -1,0 +1,147 @@
+From cf24f3b53404f28ec44d9feead8ddee9c77dea2d Mon Sep 17 00:00:00 2001
+From: lghchinaidea <lghchinaidea@gmail.com>
+Date: Sun, 9 Jun 2024 18:19:23 +0800
+Subject: [PATCH] use prebuilt snapshot files to prevent v8 crash
+
+---
+ BUILD.bazel | 108 +++++++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 98 insertions(+), 10 deletions(-)
+
+diff --git a/BUILD.bazel b/BUILD.bazel
+index 49718b71815..836b144f1ef 100644
+--- a/BUILD.bazel
++++ b/BUILD.bazel
+@@ -3862,18 +3862,86 @@ filegroup(
+     ],
+ )
+ 
++selects.config_setting_group(
++    name = "v8_target_arm64_android",
++    match_all = [
++        "@v8//bazel/config:v8_target_arm64",
++        "@v8//bazel/config:is_android",
++    ],
++)
++
++selects.config_setting_group(
++    name = "v8_target_x64_windows",
++    match_all = [
++        "@v8//bazel/config:v8_target_x64",
++        "@v8//bazel/config:is_windows",
++    ],
++)
++
++selects.config_setting_group(
++    name = "v8_target_x64_linux",
++    match_all = [
++        "@v8//bazel/config:v8_target_x64",
++        "@v8//bazel/config:is_linux",
++    ],
++)
++
++selects.config_setting_group(
++    name = "v8_target_x64_macos",
++    match_all = [
++        "@v8//bazel/config:v8_target_x64",
++        "@v8//bazel/config:is_macos",
++    ],
++)
++
++selects.config_setting_group(
++    name = "v8_target_arm64_macos",
++    match_all = [
++        "@v8//bazel/config:v8_target_arm64",
++        "@v8//bazel/config:is_macos",
++    ],
++)
++
++selects.config_setting_group(
++    name = "v8_target_arm32_android",
++    match_all = [
++        "@v8//bazel/config:v8_target_arm",
++        "@v8//bazel/config:is_android",
++    ],
++)
++
+ filegroup(
+     name = "noicu/snapshot_files",
+     srcs = [
+         "src/init/setup-isolate-deserialize.cc",
+     ] + select({
+-        "@v8//bazel/config:v8_target_arm": [
+-            "google3/snapshots/arm/noicu/embedded.S",
+-            "google3/snapshots/arm/noicu/snapshot.cc",
++        ":v8_target_arm32_android": [
++            "@v8_prebuilt_snapshot//:google3/snapshots/arm/noicu/embedded.S",
++            "@v8_prebuilt_snapshot//:google3/snapshots/arm/noicu/snapshot.cc",
++        ],
++        ":v8_target_arm64_android": [
++            "@v8_prebuilt_snapshot//:google3/snapshots/arm64/noicu/embedded.S",
++            "@v8_prebuilt_snapshot//:google3/snapshots/arm64/noicu/snapshot.cc",
++        ],
++        ":v8_target_x64_windows": [
++            "@v8_prebuilt_snapshot//:google3/snapshots/winx64/noicu/embedded.S",
++            "@v8_prebuilt_snapshot//:google3/snapshots/winx64/noicu/snapshot.cc",
++        ],
++        ":v8_target_x64_linux": [
++            "@v8_prebuilt_snapshot//:google3/snapshots/linuxx64/noicu/embedded.S",
++            "@v8_prebuilt_snapshot//:google3/snapshots/linuxx64/noicu/snapshot.cc",
++        ],
++        ":v8_target_x64_macos": [
++            "@v8_prebuilt_snapshot//:google3/snapshots/macx64/noicu/embedded.S",
++            "@v8_prebuilt_snapshot//:google3/snapshots/macx64/noicu/snapshot.cc",
++        ],
++        ":v8_target_arm64_macos": [
++            "@v8_prebuilt_snapshot//:google3/snapshots/macarm64/noicu/embedded.S",
++            "@v8_prebuilt_snapshot//:google3/snapshots/macarm64/noicu/snapshot.cc",
+         ],
+         "@v8//bazel/config:v8_target_ia32": [
+-            "google3/snapshots/ia32/noicu/embedded.S",
+-            "google3/snapshots/ia32/noicu/snapshot.cc",
++            "@v8_prebuilt_snapshot//:google3/snapshots/ia32/noicu/embedded.S",
++            "@v8_prebuilt_snapshot//:google3/snapshots/ia32/noicu/snapshot.cc",
+         ],
+         "//conditions:default": [":noicu/generated_snapshot_files"],
+     }),
+@@ -3884,13 +3952,33 @@ filegroup(
+     srcs = [
+         "src/init/setup-isolate-deserialize.cc",
+     ] + select({
+-        "@v8//bazel/config:v8_target_arm": [
+-            "google3/snapshots/arm/icu/embedded.S",
+-            "google3/snapshots/arm/icu/snapshot.cc",
++        ":v8_target_arm32_android": [
++            "@v8_prebuilt_snapshot//:google3/snapshots/arm/icu/embedded.S",
++            "@v8_prebuilt_snapshot//:google3/snapshots/arm/icu/snapshot.cc",
++        ],
++        ":v8_target_arm64_android": [
++            "@v8_prebuilt_snapshot//:google3/snapshots/arm64/icu/embedded.S",
++            "@v8_prebuilt_snapshot//:google3/snapshots/arm64/icu/snapshot.cc",
++        ],
++        ":v8_target_x64_windows": [
++            "@v8_prebuilt_snapshot//:google3/snapshots/winx64/icu/embedded.S",
++            "@v8_prebuilt_snapshot//:google3/snapshots/winx64/icu/snapshot.cc",
++        ],
++        ":v8_target_x64_linux": [
++            "@v8_prebuilt_snapshot//:google3/snapshots/linuxx64/icu/embedded.S",
++            "@v8_prebuilt_snapshot//:google3/snapshots/linuxx64/icu/snapshot.cc",
++        ],
++        ":v8_target_x64_macos": [
++            "@v8_prebuilt_snapshot//:google3/snapshots/macx64/icu/embedded.S",
++            "@v8_prebuilt_snapshot//:google3/snapshots/macx64/icu/snapshot.cc",
++        ],
++        ":v8_target_arm64_macos": [
++            "@v8_prebuilt_snapshot//:google3/snapshots/macarm64/icu/embedded.S",
++            "@v8_prebuilt_snapshot//:google3/snapshots/macarm64/icu/snapshot.cc",
+         ],
+         "@v8//bazel/config:v8_target_ia32": [
+-            "google3/snapshots/ia32/icu/embedded.S",
+-            "google3/snapshots/ia32/icu/snapshot.cc",
++            "@v8_prebuilt_snapshot//:google3/snapshots/ia32/icu/embedded.S",
++            "@v8_prebuilt_snapshot//:google3/snapshots/ia32/icu/snapshot.cc",
+         ],
+         "//conditions:default": [":icu/generated_snapshot_files"],
+     }),
+-- 
+2.45.2.windows.1
+
