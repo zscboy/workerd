@@ -31,6 +31,11 @@ build windows64:
   OR with thin-lto:
   bazelisk build //src/workerd/server:goworkerd --config=thin-lto --config=win64
 
+build macos64:
+bazelisk build //src/workerd/server:goworkerdx --config=macos64
+OR with thin-lto:
+bazelisk build //src/workerd/server:goworkerd --config=thin-lto --config=macos64
+
 v8 mksnapshots (run on target system)
    # see v8/src/snapshot/embedded/platform-embedded-file-writer-base.cc for --target_os and --target_arch options
    # on android, adb push mksnapshot executable to phone's /data/local/tmp/ directory, then chmod a+x, then run it

@@ -121,6 +121,7 @@ build:android64 --host_linkopt='-stdlib=libc++'
 # lingh: linux64 and windows64
 build:linux64 --config=m64
 build:win64 --config=m64
+build:macos64 --config=m64
 
 # build targets end
 
