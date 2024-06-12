@@ -21,7 +21,7 @@ def wd_cc_binary(
         # (mac-specific feature). In particular, the symbol table is not affected (the name of the
         # flag is misleading here).
         linkopts = linkopts + select({
-            "@//:use_dead_strip": ["-Wl,-dead_strip", "-Wl,-no_exported_symbols"],
+            "@//:use_dead_strip": ["-Wl,-dead_strip"],
             "//conditions:default": [""],
         }),
         visibility = visibility,
